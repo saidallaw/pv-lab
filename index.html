@@ -86,7 +86,13 @@ input[type=range]{width:100%;accent-color:var(--accent);direction:ltr;margin:2px
 .scope{grid-column:1/-1}
 .scope canvas{width:100%;height:92px;display:block;border-radius:6px}
 .lg{display:flex;gap:10px;font-family:var(--f-mono);font-size:10.5px;direction:ltr;flex-wrap:wrap;color:var(--muted)}
-.lg span::before{content:"";display:inline-block;width:9px;height:2px;margin-inline-end:4px;vertical-align:middle;background:var(--c)}
+.scopectl{margin-inline-start:auto;display:flex;align-items:center;gap:6px}
+.scopectl::before{display:none}
+.sbtn{border:1px solid #2a3644;background:#0d141c;color:#cfd8e3;border-radius:5px;font-family:var(--f-mono);font-size:11px;line-height:1;padding:3px 7px;cursor:pointer}
+.sbtn:hover{border-color:#5ea0ff}
+.sbtn.paused{background:#5ea0ff;color:#03060a;border-color:#5ea0ff}
+.sbtn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.lg span:not(.scopectl)::before{content:"";display:inline-block;width:9px;height:2px;margin-inline-end:4px;vertical-align:middle;background:var(--c)}
 .benchlabel{grid-column:1/-1;display:flex;justify-content:space-between;gap:8px;font-size:10px;color:#6c7e91;letter-spacing:.08em;text-transform:uppercase;font-family:var(--f-mono);direction:ltr}
 .chartbox{position:relative;direction:ltr;min-height:0}
 .chartbox canvas{width:100%;height:230px;display:block}
@@ -280,7 +286,7 @@ input[type=number],input[type=text],select{width:100%;font:inherit;font-family:v
         <div class="meter"><canvas id="gI"></canvas></div>
         <div class="meter"><canvas id="gP"></canvas></div>
         <div class="scope"><canvas id="scope"></canvas>
-          <div class="lg"><span style="--c:#5ea0ff" id="lgV">V</span><span style="--c:#34d1a0" id="lgI">I</span><span style="--c:#ffa23d" id="lgP">P</span><span style="--c:#ff5a4a" id="lgTh">T</span><span style="margin-inline-start:auto">scope · 20 s</span></div></div>
+          <div class="lg"><span style="--c:#5ea0ff" id="lgV">V</span><span style="--c:#34d1a0" id="lgI">I</span><span style="--c:#ffa23d" id="lgP">P</span><span style="--c:#ff5a4a" id="lgTh">T</span><span class="scopectl"><button class="sbtn" id="scopeRun" aria-label="Pause scope" title="Pause / run">❚❚</button><button class="sbtn" id="scopeClr" aria-label="Clear scope" title="Clear">⟲</button><span id="scopeLbl">20 s</span></span></div></div>
       </div>
       <div class="card" data-show="module">
         <div class="chartbox"><canvas id="ivMod"></canvas></div>
@@ -847,19 +853,25 @@ function drawGauge(cv,label,unit,val,fs,col){
   c.fillStyle='#7b8ca0'; c.font=`${Math.max(9,r*0.15)}px "IBM Plex Mono",monospace`; c.fillText(label+' ['+unit+']',cx,h-3);
 }
 const HIST=[]; let lastSample=0;
+let scopePaused=false, pausedAt=0;
 function scopeReset(){ HIST.length=0; }
+function toggleScope(){ const now=performance.now();
+  if(scopePaused){ const d=now-pausedAt; HIST.forEach(p=>p.t+=d); lastSample=now; }
+  else pausedAt=now;
+  scopePaused=!scopePaused; const b=$('scopeRun'); b.textContent=scopePaused?'▶':'❚❚'; b.classList.toggle('paused',scopePaused);
+  b.setAttribute('aria-label',scopePaused?'Run scope':'Pause scope'); $('scopeLbl').textContent=scopePaused?(S.lang==='ar'?'متوقف':'paused'):'20 s'; }
 function drawScope(){
   const {c,w,h}=prep($('scope')); c.fillStyle='#03060a'; c.fillRect(0,0,w,h);
   c.strokeStyle='#121b26'; c.lineWidth=1; for(let i=1;i<10;i++){ const x=w*i/10; c.beginPath(); c.moveTo(x,0); c.lineTo(x,h); c.stroke(); }
   for(let i=1;i<4;i++){ const y=h*i/4; c.beginPath(); c.moveTo(0,y); c.lineTo(w,y); c.stroke(); }
-  const now=performance.now(), span=20000;
+  const now=scopePaused?pausedAt:performance.now(), span=20000;
   [['V','#5ea0ff',FS.V],['I','#34d1a0',FS.I],['P','#ffa23d',FS.P],['T','#ff5a4a',THI]].forEach(([k,col,fs])=>{ c.strokeStyle=col; c.lineWidth=k==='T'?1.2:1.6; c.setLineDash(k==='T'?[3,3]:[]); c.beginPath(); let st=false;
     HIST.forEach(p=>{ const x=w-(now-p.t)/span*w; if(x<-2) return; const y=h-3-(h-6)*Math.max(0,Math.min(1.04,p[k]/fs)); if(!st){c.moveTo(x,y);st=true;} else c.lineTo(x,y); }); c.stroke(); });
   c.setLineDash([]);
 }
 function meterLoop(now){
   ['V','I','P'].forEach(k=>{ const m=MET[k]; m.v+=(m.t-m.v)*0.18; });
-  if(now-lastSample>100){ lastSample=now; HIST.push({t:now,V:MET.V.t,I:MET.I.t,P:MET.P.t,T:MET.T.t}); while(HIST.length&&now-HIST[0].t>21000) HIST.shift(); }
+  if(!scopePaused&&now-lastSample>100){ lastSample=now; HIST.push({t:now,V:MET.V.t,I:MET.I.t,P:MET.P.t,T:MET.T.t}); while(HIST.length&&now-HIST[0].t>21000) HIST.shift(); }
   if(S.tab==='module'||S.tab==='array'){ drawGauge($('gV'),'V','V',MET.V.v,FS.V,'#5ea0ff'); drawGauge($('gI'),'I','A',MET.I.v,FS.I,'#34d1a0'); drawGauge($('gP'),'P','W',MET.P.v,FS.P,'#ffa23d'); drawScope();
     $('lgV').textContent='V '+fmt(MET.V.t,1); $('lgI').textContent='I '+fmt(MET.I.t,2); $('lgP').textContent='P '+fmt(MET.P.t,0); $('lgTh').textContent='T_hot '+fmt(MET.T.t,0)+'°C'; }
   requestAnimationFrame(meterLoop);
@@ -1186,6 +1198,7 @@ function render(){ if(S.tab==='module') renderModule(); else if(S.tab==='array')
 function bind(){
   $('lgAr').onclick=()=>{ S.lang='ar'; renderStatic(); schedule(); }; $('lgEn').onclick=()=>{ S.lang='en'; renderStatic(); schedule(); };
   document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ S.tab=b.dataset.tab; renderStatic(); requestAnimationFrame(()=>{ if(S.tab==='module') layoutModule(); schedule(); }); });
+  $('scopeRun').onclick=toggleScope; $('scopeClr').onclick=()=>{ HIST.length=0; if(scopePaused) pausedAt=performance.now(); };
   $('undoBtn').onclick=undo; $('resetAll').onclick=resetAll;
   $('clearMod').onclick=()=>{ pushUndo(); const m=selMod(); m.shade.fill(0); m.defect.fill(0); m.soil=0; m.gf=1; m.dT=0; m.degr=0; schedule(); };
   const mb=(id,f)=>$(id).addEventListener('input',e=>{ f(selMod(),+e.target.value); schedule(); });
