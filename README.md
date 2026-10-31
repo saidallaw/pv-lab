@@ -3,7 +3,7 @@
 Free, browser-based simulator that models solar PV modules **cell by cell** using real datasheets:
 Jinko Tiger Neo (N-type TOPCon), Huasun Himalaya (HJT) and First Solar Series 6 (CdTe thin film).
 
-**Open it:** https://saidallaw.github.io/
+**Open it:** https://saidallaw.github.io/pv-lab/
 
 ## What you can do
 - Shade any cell, or add cracks, shunts and high series resistance, and watch V, I and P on live meters
