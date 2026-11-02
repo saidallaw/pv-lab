@@ -1180,9 +1180,11 @@ function explainChange(T,a,b){
     if(why) out.push(ar?`الفولت ${fmt(a.V,1)} ← ${fmt(b.V,1)} V: لأن ${why}.`:`Voltage ${fmt(a.V,1)} → ${fmt(b.V,1)} V because ${why}.`); }
   if(Math.abs(a.hot.T-b.hot.T)>3){ const up=b.hot.T>a.hot.T, ci=up?b.hot.i:a.hot.i, ca=a.cells[ci], cb=b.cells[ci]; let why;
     if(ca&&cb&&Math.abs(ca.Pd-cb.Pd)>1){
-      if(nOnB>nOnA&&cb.Pd<ca.Pd) why=ar?`لما الدايود فتح، الجهد العكسي على الخلية المظللة اتحدد (${fmt(ca.V,1)} ← ${fmt(cb.V,1)} V)، فالحرارة اللي بتبددها نزلت من ${fmt(ca.Pd,1)} لـ ${fmt(cb.Pd,1)} W`
+      if(ca.V<-0.5&&cb.V>0&&dSh) why=ar?`الظل اتشال من عليها، فرجعت تولّد تيارها الكامل وبقت شغالة طبيعي بجهد موجب (${fmt(ca.V,1)} ← ${fmt(cb.V,2)} V) وبتنتج بدل ما تستهلك، فالحرارة اللي كانت بتبددها (${fmt(ca.Pd,1)} W) راحت`
+        :`its shade was removed, so it generates its full current again and runs forward at a positive voltage (${fmt(ca.V,1)} → ${fmt(cb.V,2)} V), producing power instead of absorbing it, so the ${fmt(ca.Pd,1)} W it was dissipating is gone`;
+      else if(nOnB>nOnA&&cb.Pd<ca.Pd) why=ar?`لما الدايود فتح، الجهد العكسي على الخلية المظللة اتحدد (${fmt(ca.V,1)} ← ${fmt(cb.V,1)} V)، فالحرارة اللي بتبددها نزلت من ${fmt(ca.Pd,1)} لـ ${fmt(cb.Pd,1)} W`
         :`once the diode opened, the reverse voltage on the shaded cell was capped (${fmt(ca.V,1)} → ${fmt(cb.V,1)} V), so the heat it dissipates fell from ${fmt(ca.Pd,1)} to ${fmt(cb.Pd,1)} W`;
-      else if(nOnB<nOnA&&cb.Pd<ca.Pd) why=ar?`تيار اللوح نزل لـ ${A(b.I)}، والخلايا السليمة جنبها بتقدر تشيله، فالتيار اللي كان بيتزق في الخلية المظللة بالعكس نزل (${A(ca.I)} ← ${A(cb.I)}) وجهدها العكسي قلّ (${fmt(ca.V,1)} ← ${fmt(cb.V,1)} V)، فبطّلت تبدد حرارة (${fmt(ca.Pd,1)} ← ${fmt(cb.Pd,1)} W)`
+      else if(nOnB<nOnA&&cb.Pd<ca.Pd&&b.I<a.I) why=ar?`تيار اللوح نزل لـ ${A(b.I)}، والخلايا السليمة جنبها بتقدر تشيله، فالتيار اللي كان بيتزق في الخلية المظللة بالعكس نزل (${A(ca.I)} ← ${A(cb.I)}) وجهدها العكسي قلّ (${fmt(ca.V,1)} ← ${fmt(cb.V,1)} V)، فبطّلت تبدد حرارة (${fmt(ca.Pd,1)} ← ${fmt(cb.Pd,1)} W)`
         :`the module current dropped to ${A(b.I)}, which the healthy cells next to it can carry, so the current forced through the shaded cell fell (${A(ca.I)} → ${A(cb.I)}) and its reverse voltage fell (${fmt(ca.V,1)} → ${fmt(cb.V,1)} V), so it stopped dissipating heat (${fmt(ca.Pd,1)} → ${fmt(cb.Pd,1)} W)`;
       else if(nOnB<nOnA&&cb.Pd>ca.Pd) why=ar?`لما الدايود قفل، الخلية المظللة بقت هي اللي شايلة التيار بجهد عكسي ${fmt(cb.V,1)} V، فبقت تبدد ${fmt(cb.Pd,1)} W`
         :`once the diode closed, the shaded cell had to carry the current at ${fmt(cb.V,1)} V reverse, so it now dissipates ${fmt(cb.Pd,1)} W`;
@@ -1204,7 +1206,7 @@ function moduleInsights(T,mr,ref,hotT,pd,loss,tL){
   const ar=S.lang==='ar', out=[], subsOn=R.mtr.subs.filter(s=>s.bypass).length, m=selMod();
   const anyShade=m.shade.some(x=>x>0), anyDef=m.defect.some(x=>x>0);
   let hot=null; R.mtr.cells.forEach(c=>{ if(!hot||c.Th>hot.Th) hot=c; });
-  if(!anyShade&&!anyDef&&m.soil===0&&m.gf===1) out.push(ar?'اللوح نضيف. ظلّل خلايا أو اختار ظل جاهز وراقب العدادات والـ scope.':'The module is clean. Paint some shade or pick a preset and watch the meters and scope.');
+  if(!anyShade&&!anyDef&&m.soil===0&&m.gf===1) out.push(ar?'اللوح نضيف. ظلّل خلايا أو اختار ظل جاهز، وراقب العدادات وجراف الـ substrings.':'The module is clean. Shade some cells or pick a preset, and watch the meters and the substring monitor.');
   if(T.kind==='strip'&&anyShade) out.push(ar?'الثن فيلم: شرايح بطول اللوح كلها توالي. الظل اللي بيقطع الشرايح بالعرض خسارته نسبية، أما اللي بيغطي شرايح بطولها بيخنق التيار.':'Thin film: strips run the module length, all in series. Shade across the strips costs proportionally; shade along whole strips chokes the current.');
   if(hotT>85) out.push(ar?`Hot spot ${fmt(hotT,0)}°C: الخلية بتبدد ${fmt(hot.Pd,1)} W عند ${fmt(hot.V,1)} V. فوق 85°C الـ EVA والـ backsheet في خطر، وفوق 120°C فيه browning وحرق.`:`Hot spot ${fmt(hotT,0)}°C: the cell dissipates ${fmt(hot.Pd,1)} W at ${fmt(hot.V,1)} V. Above 85°C the encapsulant and backsheet are at risk; above 120°C expect browning and burn marks.`);
   if(S.ctx==='iso'&&anyShade&&T.kind==='csi') out.push(ar?'جرّب "جوه المصفوفة": الاسترينج بيفرض تيار أعلى على اللوح المظلل، والـ hot spot بيبان أكتر.':'Switch to "In array": the string forces a higher current through the shaded module and the hot spot gets worse.');
