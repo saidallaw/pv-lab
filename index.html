@@ -17,6 +17,7 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+canvas{direction:ltr}
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:13px;line-height:1.45;margin:0;
   padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px));padding-block:8px}
@@ -66,6 +67,7 @@ input[type=range]{width:100%;accent-color:var(--accent);direction:ltr;margin:2px
 .btn.primary{background:var(--accent);color:#06080b;border-color:var(--accent);font-weight:600}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
 .seg button{border:0;background:transparent;padding:3px 8px;cursor:pointer;font-size:11.5px}
+#viewSeg{flex-wrap:wrap}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .between{justify-content:space-between}
@@ -76,6 +78,13 @@ input[type=range]{width:100%;accent-color:var(--accent);direction:ltr;margin:2px
 .hc span{font-size:10.5px;color:var(--muted)}
 .hc b{font-family:var(--f-mono);font-size:15px;font-weight:500;direction:ltr;text-align:start}
 .plate{position:relative;flex:1 1 auto;min-height:260px;display:flex;align-items:center;justify-content:center}
+.plate.zoom{overflow:auto;align-items:flex-start;justify-content:flex-start;height:0;border:1px solid var(--line);border-radius:8px}
+.plate.zoom .pwrap{margin:auto}
+.pwrap{position:relative;flex:none;line-height:0}
+#flowCv{position:absolute;left:0;top:0;pointer-events:none}
+#cellCv{height:170px!important}
+#cmpA table td,#cmpA table th{padding:3px 6px}
+.btn[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 22%,var(--panel2))}
 #modCv{touch-action:none;cursor:crosshair;display:block}
 .tip{position:absolute;pointer-events:none;background:#000c;border:1px solid var(--line);color:var(--ink);font-family:var(--f-mono);font-size:11px;padding:5px 7px;border-radius:6px;white-space:pre;z-index:5;direction:ltr}
 .legend{display:flex;gap:6px;align-items:center;font-size:10.5px;color:var(--muted);direction:ltr;justify-content:center}
@@ -106,6 +115,8 @@ input[type=range]{width:100%;accent-color:var(--accent);direction:ltr;margin:2px
 .chip{font-size:11px;border-radius:999px;padding:2px 9px;border:1px solid var(--line)}
 .chip.on{background:color-mix(in srgb,var(--pwr) 22%,var(--panel));border-color:var(--pwr)}
 .chip.ok{background:color-mix(in srgb,var(--ok) 14%,var(--panel));border-color:color-mix(in srgb,var(--ok) 60%,var(--line))}
+.insights li.ih{list-style:none;margin-inline-start:-16px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.insights li.chg{color:#ffd9a8}
 .insights{margin:0;padding-inline-start:16px;display:flex;flex-direction:column;gap:4px;font-size:12.5px}
 .strings{display:flex;flex-direction:column;gap:6px}
 .str{border:1px solid var(--line);border-radius:8px;padding:5px 8px;display:flex;flex-direction:column;gap:4px}
@@ -128,6 +139,12 @@ input[type=number],input[type=text],select{width:100%;font:inherit;font-family:v
 .verdict{font-size:12px;display:flex;flex-direction:column;gap:3px}
 .pass{color:var(--ok)} .fail{color:var(--hot)} .caution{color:var(--warn)}
 .note{font-size:11.5px;color:var(--muted);margin:0}
+.hs{margin:0;padding-inline-start:22px;display:flex;flex-direction:column;gap:10px;font-size:13px;line-height:1.55}
+.hs li>b{display:block;color:var(--ink);font-family:var(--f-display);font-weight:600}
+.hs li span b{color:#ffd08a;font-weight:600}
+.hs li span{color:#c3cfdb}
+.hs li::marker{color:var(--pwr);font-family:var(--f-mono)}
+.tb.hot{border-color:color-mix(in srgb,var(--hot) 60%,var(--line));color:#ffb3aa}
 .locbox{display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--panel2)}
 .btn.reset{border-color:color-mix(in srgb,var(--hot) 55%,var(--line));color:#ffb3aa}
 .toolhelp{font-size:11px;color:var(--muted)}
@@ -239,10 +256,10 @@ input[type=number],input[type=text],select{width:100%;font:inherit;font-family:v
       <div class="stage" data-show="module">
         <div class="row between">
           <div class="row"><button class="btn" id="selPrev" aria-label="previous">‹</button><span class="mono" id="selLbl"></span><button class="btn" id="selNext" aria-label="next">›</button></div>
-          <div class="row"><div class="seg" id="laySeg"></div><div class="seg" id="ctxSeg"></div></div>
+          <div class="row"><button class="btn" id="flowBtn" aria-pressed="true" data-i="flow"></button><button class="btn" id="zoomBtn" aria-pressed="false" data-i="zoom"></button><div class="seg" id="laySeg"></div><div class="seg" id="ctxSeg"></div></div>
         </div>
         <div class="hud" id="hud"></div>
-        <div class="plate" id="plate"><canvas id="modCv"></canvas><div class="tip" id="tip" hidden></div></div>
+        <div class="plate" id="plate"><div class="pwrap" id="pwrap"><canvas id="modCv"></canvas><canvas id="flowCv" aria-hidden="true"></canvas></div><div class="tip" id="tip" hidden></div></div>
         <div class="legend" id="legend"></div>
       </div>
       <div class="stage" data-show="array">
@@ -285,11 +302,18 @@ input[type=number],input[type=text],select{width:100%;font:inherit;font-family:v
         <div class="meter"><canvas id="gV"></canvas></div>
         <div class="meter"><canvas id="gI"></canvas></div>
         <div class="meter"><canvas id="gP"></canvas></div>
-        <div class="scope"><canvas id="scope"></canvas>
-          <div class="lg"><span style="--c:#5ea0ff" id="lgV">V</span><span style="--c:#34d1a0" id="lgI">I</span><span style="--c:#ffa23d" id="lgP">P</span><span style="--c:#ff5a4a" id="lgTh">T</span><span class="scopectl"><button class="sbtn" id="scopeRun" aria-label="Pause scope" title="Pause / run">❚❚</button><button class="sbtn" id="scopeClr" aria-label="Clear scope" title="Clear">⟲</button><span id="scopeLbl">20 s</span></span></div></div>
+        <div class="scope"><canvas id="scope"></canvas><div class="lg" id="stateLg"></div></div>
+      </div>
+      <div class="card" id="inspCard" data-show="module" hidden>
+        <div class="row between"><h3 id="inspName"></h3><button class="btn" id="inspClose" aria-label="close">✕</button></div>
+        <div class="chartbox"><canvas id="cellCv"></canvas></div>
+        <div class="metrics" id="inspMetrics" style="grid-template-columns:repeat(5,minmax(0,1fr))"></div>
+        <p class="note" id="inspText" style="color:#c3cfdb;font-size:12.5px"></p>
       </div>
       <div class="card" data-show="module">
+        <div class="row between"><h3 data-i="ivTitle2"></h3><div class="row"><button class="btn" id="saveA" data-i="saveA"></button><button class="btn" id="clrA" data-i="clearA" hidden></button></div></div>
         <div class="chartbox"><canvas id="ivMod"></canvas></div>
+        <div class="tw" id="cmpA" hidden></div>
         <div class="metrics" id="modMetrics"></div>
         <div class="row"><h3 data-i="bypassState"></h3><div class="chips" id="bypChips"></div></div>
       </div>
@@ -300,6 +324,12 @@ input[type=number],input[type=text],select{width:100%;font:inherit;font-family:v
 </div>
 
 <!-- datasheet dialog -->
+<div class="modal" id="hsModal" hidden>
+  <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="hsH">
+    <div class="row between"><h2 id="hsH" data-i="hsHow"></h2><button class="btn" id="hsClose" aria-label="close">✕</button></div>
+    <ol class="hs" id="hsBody"></ol>
+  </div>
+</div>
 <div class="modal" id="dsModal" hidden>
   <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dsH">
     <div class="row between"><h2 id="dsH" data-i="dsDlgTitle"></h2><button class="btn" id="dsClose" aria-label="close">✕</button></div>
@@ -462,12 +492,13 @@ class Engine{
   trace(r,I){
     const t=this.t, Cg=this.Cg, Ig=this.Ig, cellOut=new Array(r.cells.length), subOut=[];
     const area=t.w*t.h/1e6/(t.Ns*t.Np);
+    const Tm=r.cells.reduce((a,c)=>a+c.T,0)/r.cells.length;
     r.subs.forEach(s=>{
       const raw=interp(Ig,s.raw,I), vb=vByp(I), on=t.bypass&&raw<vb, Vs=on?vb:raw;
       subOut.push({V:Vs,bypass:on,Id:on?Math.max(0,I-s.halves.reduce((a,h)=>a+invDec(Cg,h.V,Vs)*(t.Np===1?1:1),0)):0});
       s.halves.forEach(h=>{ const Ih = t.kind!=='csi' ? I : invDec(Cg,h.V,Vs);
         h.ids.forEach(id=>{ const c=r.cells[id], V=interp(Cg,this.cellCurve(c),Ih), Pd=Math.max(0,-V*Ih);
-          cellOut[id]={V,I:Ih,Pd,G:c.G,T:c.T,Th:c.T+Pd/(25*area*2),d:c.d}; }); });
+          cellOut[id]={V,I:Ih,Pd,G:c.G,T:c.T,Th:0.4*c.T+0.6*Tm+Pd/(25*area*2),d:c.d}; }); });
     });
     return {cells:cellOut,subs:subOut};
   }
@@ -514,7 +545,7 @@ cmpDay:"يوم كامل بدون ظل",cmpDayNote:"سماء صافية، حرا�
 cmpShade:"نفس الظل على كل التكنولوجيات",cmpShadeNote:"نفس المساحة الفيزيائية للظل عند STC. الخسارة للوح لوحده عند الـ MPP بتاعه، وأسخن خلية عند تيار الاسترينج (Imp للوح سليم).",
 dsTitle:"الداتا شيت",mdlTitle:"معاملات النموذج",addDs:"+ ارفع داتا شيت",
 shade:"ظل",erase:"ممحاة",crack:"شرخ",shunt:"شنت",highrs:"Rs عالي",
-vShade:"الظل",vTemp:"الحرارة",vVolt:"الفولت",ctxIso:"لوح لوحده",ctxArr:"جوه المصفوفة",
+vRead:"القراءات",vIR:"حراري IR",flow:"⇄ مسار التيار",inspect:"افحص خلية",saveA:"📌 احفظ كـ A",clearA:"امسح A",ivTitle2:"منحنى I-V و P-V",hsBtn:"🔥 هوت سبوت (أسوأ حالة)",hsHow:"الهوت سبوت بيحصل إزاي",zoom:"تكبير ×2",vShade:"الظل",vTemp:"الحرارة",vVolt:"الفولت",ctxIso:"لوح لوحده",ctxArr:"جوه المصفوفة",
 pBottom:"صف سفلي",pBird:"فضلات طيور",pPole:"عمود",pSide:"حائط جانبي",pCorner:"ركن",pHalf:"نص سفلي",
 trkG:"Global",trkPO:"P&O",dayAs:"أسوان – يوليو",dayCa:"القاهرة – يناير",
 mod:"لوح",str:"استرينج",
@@ -553,7 +584,7 @@ cmpDay:"Full day, no shading",cmpDayNote:"Clear sky, NOCT module temperature, en
 cmpShade:"The same shadow on every technology",cmpShadeNote:"Same physical shadow at STC. Loss is the module alone at its own MPP; hottest cell at string current (healthy Imp).",
 dsTitle:"Datasheet",mdlTitle:"Model parameters",addDs:"+ Upload datasheet",
 shade:"Shade",erase:"Eraser",crack:"Crack",shunt:"Shunt",highrs:"High Rs",
-vShade:"Shading",vTemp:"Temperature",vVolt:"Voltage",ctxIso:"Module alone",ctxArr:"In array",
+vRead:"Readings",vIR:"IR",flow:"⇄ Current flow",inspect:"Inspect",saveA:"📌 Save as A",clearA:"Clear A",ivTitle2:"I-V and P-V",hsBtn:"🔥 Worst-case hot spot",hsHow:"How a hot spot forms",zoom:"Zoom ×2",vShade:"Shading",vTemp:"Temperature",vVolt:"Voltage",ctxIso:"Module alone",ctxArr:"In array",
 pBottom:"Bottom row",pBird:"Bird dropping",pPole:"Pole",pSide:"Side wall",pCorner:"Corner",pHalf:"Bottom half",
 trkG:"Global",trkPO:"P&O",dayAs:"Aswan – July",dayCa:"Cairo – January",
 mod:"Module",str:"String",
@@ -578,8 +609,9 @@ const fmt=(v,d=1)=>Number.isFinite(v)?v.toFixed(d):'–';
 
 // ================= state =================
 const S={lang:'en',tech:'topcon',env:{G:1000,Tamb:25,Grear:0,cellMis:0,tolMis:false},strings:[],sel:{s:0,m:0},
-  tool:'shade',toolVal:1,view:'shade',ctx:'iso',track:'global',tab:'module',day:'as',
+  tool:'shade',toolVal:1,view:'read',ctx:'iso',track:'global',tab:'module',day:'as',
   inv:{vmin:500,vmax:1500,vdc:1500,tmin:5,tmax:45},src:'manual',layout:null,
+  flow:true,insp:null,snapA:null,zoom:false,
   loc:{city:0,lat:30.04,lon:31.24,month:6,hour:12,tilt:25,az:0}};
 const ENV0=JSON.stringify(S.env), INV0=JSON.stringify(S.inv), LOC0=JSON.stringify(S.loc);
 let eng=null, R={}, aux=null;
@@ -597,7 +629,7 @@ function CT(){ const B=TECHS[S.tech]; if(B.kind!=='csi'||!S.layout) return B;
                            :{...B,rows:B.rows*2,Np:2,cellDesc:`${B.Ns*2} half-cells (6×${B.rows*2})`,fit:null};
   fitTech(V); return VAR[k]=V; }
 function setTech(id){
-  S.tech=id; const T=CT(); eng=new Engine(T,S.env); aux=null; UNDO.length=0;
+  S.tech=id; const T=CT(); eng=new Engine(T,S.env); aux=null; UNDO.length=0; S.insp=null; FLOW=[];
   if(!BASE[id]) BASE[id]=T.kind==='strip'?'#241e1a':'#15325e';
   const n=defLen(T); S.strings=[0,1].map(()=>Array.from({length:n},()=>eng.newModule()));
   S.sel={s:0,m:0}; scopeReset(); renderTechs(); layoutModule(); schedule();
@@ -648,7 +680,7 @@ function chart(cv,o){
   const xs=o.xs||nice(o.xmax-x0), ys=o.ys||nice(o.ymax-y0), y2s=o.y2l?nice(o.y2max):null;
   const X=v=>pl+(v-x0)/xs.max*W, Y=v=>pt+H-(v-y0)/ys.max*H, Y2=v=>pt+H-v/y2s.max*H;
   c.font='10.5px "IBM Plex Mono",monospace'; c.lineWidth=1;
-  if(o.band){ const a=Math.max(x0,o.band[0]), b=Math.min(o.band[1],x0+xs.max); if(b>a){ c.fillStyle='rgba(91,140,255,.08)'; c.fillRect(X(a),pt,X(b)-X(a),H); } }
+  if(o.band){ const a=Math.max(x0,o.band[0]), b=Math.min(o.band[1],x0+xs.max); if(b>a){ c.fillStyle=o.bandc||'rgba(91,140,255,.08)'; c.fillRect(X(a),pt,X(b)-X(a),H); } }
   c.strokeStyle=line; c.fillStyle=mut; c.textAlign='center';
   for(let v=0;v<=xs.max+1e-9;v+=xs.step){ const x=X(x0+v); c.beginPath(); c.moveTo(x,pt); c.lineTo(x,pt+H); c.stroke(); c.fillText(+(x0+v).toFixed(6)+'',x,pt+H+13); }
   c.textAlign='right';
@@ -741,8 +773,9 @@ let GEO=null;
 function layoutModule(){
   const T=CT(), plate=$('plate'), cv=$('modCv');
   const pw=Math.max(200,plate.clientWidth-8), ph=Math.max(240,plate.clientHeight-6);
-  let H=ph, W=H*T.w/T.h; if(W>pw){ W=pw; H=W*T.h/T.w; }
-  W=Math.round(W); H=Math.round(H); cv.style.width=W+'px'; cv.style.height=H+'px';
+  plate.classList.toggle('zoom',!!S.zoom); $('zoomBtn').setAttribute('aria-pressed',!!S.zoom);
+  let H=ph, W=H*T.w/T.h; if(W>pw){ W=pw; H=W*T.h/T.w; } if(S.zoom){ const z=Math.max(2,Math.min(3.2,pw*0.98/W)); W*=z; H*=z; }
+  W=Math.round(W); H=Math.round(H); cv.style.width=W+'px'; cv.style.height=H+'px'; const fc=$('flowCv'); fc.style.width=W+'px'; fc.style.height=H+'px';
   const fr=Math.max(5,W*0.025), gap=T.kind==='csi'?Math.max(1,W*0.006):0, mid=(T.kind==='csi'&&T.Np===2)?H*0.022:0;
   const iw=W-2*fr, ih=H-2*fr-mid, cw=(iw-gap*(T.cols-1))/T.cols, ch=(ih-gap*(T.rows-1))/T.rows;
   const rects=[];
@@ -764,7 +797,7 @@ function drawModule(){
     let fill=base;
     if(S.view==='temp') fill=heat(co.Th,TLO,THI); else if(S.view==='volt') fill=vcol(co.V);
     c.fillStyle=fill; c.fillRect(r.x,r.y,r.w,r.h);
-    if(S.view==='shade'){
+    if(S.view==='shade'||S.view==='read'){
       c.strokeStyle=T.kind==='csi'?'rgba(200,215,235,.2)':'rgba(255,255,255,.06)'; c.lineWidth=0.6;
       for(let k=1;k<6;k++){ const x=r.x+r.w*k/6; c.beginPath(); c.moveTo(x,r.y); c.lineTo(x,r.y+r.h); c.stroke(); }
       const sh=m.shade[i]; if(sh>0){ c.fillStyle=`rgba(4,5,8,${0.25+0.68*sh})`; c.fillRect(r.x,r.y,r.w,r.h); }
@@ -778,6 +811,7 @@ function drawModule(){
     if(S.view==='temp'&&T.kind==='csi'&&g.cw>=24&&g.ch>=12){ c.fillStyle=co.Th>95?'#fff':'#0b0f14'; c.font=`500 ${fs}px "IBM Plex Mono",monospace`; c.textAlign='center'; c.fillText(Math.round(co.Th),r.x+r.w/2,r.y+r.h/2+fs*0.35); }
     if(S.view==='volt'&&T.kind==='csi'&&g.cw>=26&&g.ch>=12){ c.fillStyle='#fff'; c.font=`${fs*0.9}px "IBM Plex Mono",monospace`; c.textAlign='center'; c.fillText(co.V.toFixed(1),r.x+r.w/2,r.y+r.h/2+fs*0.3); }
   });
+  if(S.view==='ir') drawIR(c,T,cells);
   // bypass diodes
   if(T.kind==='csi'){
     const cps=T.cols/T.nSub, yM=g.mid?h/2:h-g.fr*0.6-4;
@@ -787,19 +821,33 @@ function drawModule(){
         c.fillStyle=s.bypass?cssv('--pwr'):'#3a4048'; c.fillRect(bx-bw/2,yM-bh/2,bw,bh);
         c.fillStyle='#fff'; c.beginPath(); c.moveTo(bx-4,yM-3); c.lineTo(bx-4,yM+3); c.lineTo(bx+3,yM); c.closePath(); c.fill(); c.fillRect(bx+3,yM-3,1.5,6); } });
   }
+  // per-cell readings: V, I, T on every cell
+  if(S.view==='read'&&T.kind==='csi'){
+    const fs=Math.max(5.5,Math.min(11,g.ch/3.25,g.cw/4.4)), lh=fs*1.05;
+    c.textAlign='center'; c.textBaseline='middle'; c.lineJoin='round';
+    const f2=v=>Math.abs(v)<10?v.toFixed(2):v.toFixed(1);
+    g.rects.forEach((r,i)=>{ const co=cells[i], cx=r.x+r.w/2, cy=r.y+r.h/2;
+      const rows=[[f2(co.V)+'V',co.V<-0.05?'#ff8f80':'#bcd6ff'],[f2(co.I)+'A','#7cf0c6'],[Math.round(co.Th)+'°',co.Th>95?'#ffffff':heat(co.Th,TLO,THI)]];
+      c.font=`600 ${fs}px "IBM Plex Mono",monospace`;
+      rows.forEach(([txt,col],k)=>{ const y=cy+(k-1)*lh; c.lineWidth=2.6; c.strokeStyle='rgba(0,0,0,.78)'; c.strokeText(txt,cx,y); c.fillStyle=col; c.fillText(txt,cx,y); }); });
+    c.textBaseline='alphabetic';
+  }
   // hot-spot callout
-  if(hotI>=0&&hotT>tmod+8){ const r=g.rects[hotI], cx=r.x+r.w/2, cy=r.y+r.h/2;
+  if(S.view!=='read'&&S.view!=='ir'&&hotI>=0&&hotT>tmod+8){ const r=g.rects[hotI], cx=r.x+r.w/2, cy=r.y+r.h/2;
     c.strokeStyle='#fff'; c.lineWidth=2; c.beginPath(); c.arc(cx,cy,Math.max(r.w,r.h)*0.62,0,7); c.stroke();
     const txt=Math.round(hotT)+'°C', bw=c.measureText(txt).width; c.font='600 13px "IBM Plex Mono",monospace';
     const tw=c.measureText(txt).width+10, tx=Math.min(w-tw-4,Math.max(4,cx-tw/2)), ty=cy-Math.max(r.w,r.h)*0.62-22<4?cy+Math.max(r.w,r.h)*0.62+4:cy-Math.max(r.w,r.h)*0.62-22;
     c.fillStyle=heat(hotT,TLO,THI); c.fillRect(tx,ty,tw,18); c.fillStyle='#0b0f14'; c.textAlign='left'; c.fillText(txt,tx+5,ty+13); }
   // module temperature stamp on the glass
-  if(S.view!=='temp'){ c.font='600 12px "IBM Plex Mono",monospace'; const st=`T ${tmod.toFixed(1)}°C`, sw=c.measureText(st).width+12;
+  if(S.view!=='temp'&&S.view!=='read'&&S.view!=='ir'){ c.font='600 12px "IBM Plex Mono",monospace'; const st=`T ${tmod.toFixed(1)}°C`, sw=c.measureText(st).width+12;
   c.fillStyle='rgba(0,0,0,.65)'; c.fillRect(g.fr+2,g.fr+2,sw,19); c.fillStyle=heat(tmod,TLO,THI); c.textAlign='left'; c.fillText(st,g.fr+8,g.fr+15.5); }
   const lg=$('legend');
-  if(S.view==='temp') lg.innerHTML=`<span>${TLO}°C</span><span class="bar2" style="background:linear-gradient(90deg,${[15,50,85,120,150].map(v=>heat(v,TLO,THI)).join(',')})"></span><span>${THI}°C</span>`;
+  if(S.view==='ir') lg.innerHTML=`<span>${fmt(IRR.lo,1)}°C</span><span class="bar2" style="background:linear-gradient(90deg,${[0,.25,.5,.75,1].map(x=>'rgb('+iron(x).join(',')+')').join(',')})"></span><span>${fmt(IRR.hi,1)}°C</span><span>· ${S.lang==='ar'?'مدى تلقائي زي كاميرا الدرون الحرارية':'auto range, like a drone IR camera'}</span>`;
+  else if(S.view==='read') lg.innerHTML=T.kind==='csi'?`<span style="color:#bcd6ff">V ${S.lang==='ar'?'فولت الخلية':'cell voltage'}</span> · <span style="color:#7cf0c6">I ${S.lang==='ar'?'تيار الخلية':'cell current'}</span> · <span style="color:#ffb35c">T ${S.lang==='ar'?'حرارة الخلية':'cell temperature'}</span> · <span style="color:#ff8f80">${S.lang==='ar'?'أحمر = جهد عكسي':'red V = reverse'}</span>`:`<span>${S.lang==='ar'?'الثن فيلم شرايح رفيعة: مرّر الماوس على أي شريحة تشوف قراءاتها':'Thin-film strips are too narrow for labels: hover a strip to read it'}</span>`;
+  else if(S.view==='temp') lg.innerHTML=`<span>${TLO}°C</span><span class="bar2" style="background:linear-gradient(90deg,${[15,50,85,120,150].map(v=>heat(v,TLO,THI)).join(',')})"></span><span>${THI}°C</span>`;
   else if(S.view==='volt') lg.innerHTML=`<span>−12 V</span><span class="bar2" style="background:linear-gradient(90deg,${vcol(-12)},${vcol(-3)},${vcol(0)},${vcol(0.7)})"></span><span>+0.8 V</span>`;
   else lg.innerHTML=`<span>${S.lang==='ar'?'الإطار بيتلون بحرارة اللوح · الأحمر = خلية بتسخن':'Frame colour = module temperature · red glow = heating cell'}</span>`;
+  buildFlow(T,tr,cells);
   return {tmod,hotT};
 }
 function hitCell(ev){ const r=$('modCv').getBoundingClientRect(), x=ev.clientX-r.left, y=ev.clientY-r.top;
@@ -815,9 +863,9 @@ function applyTool(i){ if(i<0) return; const m=selMod();
   schedule(); }
 function bindPlate(){
   const cv=$('modCv'), tip=$('tip'); let down=false, last=-1;
-  cv.addEventListener('pointerdown',e=>{ last=hitCell(e); if(last<0) return; down=true; cv.setPointerCapture(e.pointerId); pushUndo(); paintErase=isMarked(selMod(),last); applyTool(last); });
+  cv.addEventListener('pointerdown',e=>{ last=hitCell(e); if(last<0) return; if(S.tool==='inspect'){ S.insp=last; schedule(); return; } down=true; cv.setPointerCapture(e.pointerId); pushUndo(); paintErase=isMarked(selMod(),last); applyTool(last); });
   cv.addEventListener('pointermove',e=>{ const i=hitCell(e);
-    if(down&&i!==last){ last=i; applyTool(i); }
+    if(down&&i!==last&&S.tool!=='inspect'){ last=i; applyTool(i); }
     if(i>=0&&R.mtr){ const T=CT(), co=R.mtr.cells[cellOf(T,i)], pr=$('plate').getBoundingClientRect();
       const rr=T.kind==='csi'?`r${Math.floor(i/T.cols)+1} c${i%T.cols+1}`:`strip group ${i%T.cols+1}`;
       tip.textContent=`${rr}\nG ${co.G} W/m²   T ${fmt(co.Th,0)} °C\nV ${fmt(co.V,2)} V   I ${fmt(co.I,2)} A\nPdiss ${fmt(co.Pd,1)} W`;
@@ -825,8 +873,165 @@ function bindPlate(){
   const end=()=>{ down=false; }; cv.addEventListener('pointerup',end); cv.addEventListener('pointercancel',end);
   cv.addEventListener('pointerleave',()=>{ tip.hidden=true; });
 }
+// ---------- hot-spot scenario + explainer ----------
+function hotCellIndex(T){ return T.kind==='csi' ? Math.floor(T.rows*0.25)*T.cols+Math.min(T.cols-1,Math.floor(T.cols*0.45)) : Math.floor(T.cols*0.45); }
+function applyCellShade(T,m,idx,f){ if(T.kind==='csi') m.shade[idx]=f; else { const c=idx%T.cols; for(let r=0;r<T.rows;r++) m.shade[r*T.cols+c]=f; } }
+function worstHotSpot(){
+  const T=CT(), Iforce=eng.module(eng.newModule()).mpp.I, idx=hotCellIndex(T); let best={f:1,Pd:-1,Th:0,V:0,I:0};
+  for(let f=0.1;f<=1.0001;f+=0.05){ const m=eng.newModule(); applyCellShade(T,m,idx,Math.round(f*100)/100);
+    const r=eng.module(m,0), tr=eng.trace(r,Iforce); const c=tr.cells.reduce((a,x)=>x.Pd>a.Pd?x:a);
+    if(c.Pd>best.Pd) best={f:Math.round(f*100)/100,Pd:c.Pd,Th:c.Th,V:c.V,I:c.I}; }
+  return {...best,idx,Iforce};
+}
+let HS=null;
+function makeHotSpot(){
+  const T=CT(); pushUndo(); const w=worstHotSpot(); const m=selMod(); m.shade.fill(0); m.defect.fill(0);
+  applyCellShade(T,m,w.idx,w.f); HS=w; S.insp=w.idx;
+  S.ctx='arr'; S.view='read'; S.zoom=T.kind==='csi'; renderStatic(); layoutModule(); schedule();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ const p=$('plate'), r=GEO&&GEO.rects[w.idx]; if(S.zoom&&r){ p.scrollTop=Math.max(0,r.y-p.clientHeight/2); p.scrollLeft=Math.max(0,r.x-p.clientWidth/2); } openHsInfo(); }));
+}
+function openHsInfo(){
+  const T=CT(), ar=S.lang==='ar', A=v=>fmt(v,2)+' A';
+  const cells=R.mtr?R.mtr.cells:[]; let hi=0; cells.forEach((c,i)=>{ if(c.Pd>cells[hi].Pd) hi=i; });
+  const h=cells[hi]||{V:0,I:0,Pd:0,Th:0}, Iop=R.Icur||0, live=h.Pd>1;
+  const Iref=R.mref?R.mref.mpp.I:T.Imp, perCell=T.Np===2?Iref/2:Iref;
+  const cps=T.kind==='csi'?T.cols/T.nSub:1, cellsPerSub=T.kind==='csi'?T.rows/T.Np*cps:T.Ns;
+  const vOthers=(cellsPerSub-1)*0.55;
+  const wf=HS?Math.round(HS.f*100):null;
+  const n=(x)=>`<b class="mono">${x}</b>`;
+  const steps=ar?[
+    ['حاجة بتغطي جزء من خلية واحدة',`فضلات طيور، ورقة شجر، تراب متجمع، أو شرخ. الخلية دي بتولّد تيار أقل من جيرانها بنسبة التغطية تقريباً${wf!=null?`، وهنا التغطية ${n(wf+'%')}`:''}.`],
+    ['اللوح مش لوحده',`اللوح متوصل في استرينج مع ألواح تانية سليمة، وهي اللي بتفرض تيار الاسترينج (حوالي ${n(A(Iop||Iref))}) على كل الخلايا اللي على التوالي، ومنها الخلية المغطاة.`],
+    ['الخلية بتتعكس',`الخلية مش قادرة تولّد التيار ده، فباقي الخلايا اللي معاها في نفس الـ substring (حوالي ${n(cellsPerSub-1)} خلية × 0.55 V ≈ ${n(fmt(vOthers,0)+' V')}) بيزقوا التيار فيها بالعكس، فجهدها بيبقى سالب${live?`: هنا ${n(fmt(h.V,1)+' V')}`:''}.`],
+    ['بدل ما تنتج، بتستهلك',`القدرة اللي بتتحول حرارة = |V| × I${live?` = ${n(fmt(Math.abs(h.V),1)+' V')} × ${n(A(h.I))} = ${n(fmt(h.Pd,1)+' W')}`:''}، ومتركزة في مساحة خلية واحدة، فحرارتها بتطلع${live?` لـ ${n(fmt(h.Th,0)+'°C')}`:' جامد'} وجيرانها حوالي ${n(fmt(R.mtr?R.mtr.cells.reduce((a,c)=>a+c.T,0)/R.mtr.cells.length:45,0)+'°C')}.`],
+    ['الـ bypass diode بيحمي بس مش بيلغي المشكلة',`الدايود بيحدد الجهد العكسي على الخلية بمجموع جهد باقي خلايا الـ substring تقريباً، فبيمنع إن جهد الاسترينج كله يتحط عليها. بس الخلية لسه بتسخن.`],
+    ['أسوأ حالة هي التغطية الجزئية، مش الكاملة',`الخلية المضلمة خالص بتعدّي تيار عكسي قليل جداً. أما المغطاة جزئياً فبتعدّي تيار كبير وهي عليها جهد عكسي عالي، فالحرارة أكبر بكتير${wf!=null?`. في اللوح ده أسوأ نسبة تغطية طلعت ${n(wf+'%')}`:''}. عشان كده اختبار الـ hot spot في IEC 61215 بيدوّر على أسوأ نسبة تظليل.`],
+    ['ليه لما تظلل خلايا أكتر حرارتهم بتقل',`لو اتنين أو أكتر في نفس الـ substring متظللين، بيتقسم عليهم الجهد العكسي (مثلاً حوالي 7 V لكل واحدة بدل 15 V). عند الجهد ده الخلية بتعدّي تيار عكسي صغير، فكل واحدة بتبدد حرارة قليلة والـ bypass diode بيشيل التيار. وكمان الخلية المظللة مش بتسخن من الشمس.`],
+    ['في الحقيقة بيحصل إيه',`اصفرار أو حرق في الـ EVA والـ backsheet، انفصال طبقات، شرخ في الزجاج، ولو الحالة شديدة ممكن حريق. بيتكشف بالتصوير الحراري (IR) بالدرون. والوقاية: التنظيف، تجنب الظل الجزئي في التصميم، ألواح Half-cut، bypass diodes أكتر، أو optimizers.`]]
+  :[
+    ['Something covers part of one cell',`A bird dropping, a leaf, caked dust or a crack. That cell now generates less current than its neighbours, roughly in proportion to the covered area${wf!=null?`; here ${n(wf+'%')} is covered`:''}.`],
+    ['The module is not alone',`It sits in a string with healthy modules, and they set the string current (about ${n(A(Iop||Iref))}) through every cell in series, including the covered one.`],
+    ['The cell is driven into reverse',`It cannot generate that current, so the other cells in its substring (about ${n(cellsPerSub-1)} cells × 0.55 V ≈ ${n(fmt(vOthers,0)+' V')}) push the current through it backwards and its voltage goes negative${live?`: here ${n(fmt(h.V,1)+' V')}`:''}.`],
+    ['It absorbs power instead of producing it',`Heat = |V| × I${live?` = ${n(fmt(Math.abs(h.V),1)+' V')} × ${n(A(h.I))} = ${n(fmt(h.Pd,1)+' W')}`:''}, concentrated in a single cell, so it climbs${live?` to ${n(fmt(h.Th,0)+'°C')}`:' sharply'} while its neighbours sit around ${n(fmt(R.mtr?R.mtr.cells.reduce((a,c)=>a+c.T,0)/R.mtr.cells.length:45,0)+'°C')}.`],
+    ['The bypass diode protects, but does not remove it',`The diode limits the reverse voltage on the cell to about the sum of the other cells in its substring, so the whole string voltage can never land on it. The cell still heats up.`],
+    ['Partial covering is worse than full covering',`A fully dark cell lets very little reverse current through. A partly covered cell still passes a large current while sitting at a high reverse voltage, so it dissipates far more${wf!=null?`. For this module the worst coverage came out at ${n(wf+'%')}`:''}. That is why the IEC 61215 hot-spot test searches for the worst shading level.`],
+    ['Why shading more cells makes them cooler',`When two or more cells in the same substring are covered, they share the reverse voltage (about 7 V each instead of 15 V). At that voltage a cell passes very little reverse current, so each dissipates little heat and the bypass diode carries the current. A shaded cell also gets no solar heating.`],
+    ['What it looks like in the field',`Browning or burn marks in the EVA and backsheet, delamination, cracked glass, and in severe cases fire. It is found with drone IR thermography. Prevention: cleaning, avoiding partial shade in the layout, half-cut modules, more bypass diodes, or optimizers.`]];
+  $('hsBody').innerHTML=steps.map((s,i)=>`<li><b>${s[0]}</b><span>${s[1]}</span></li>`).join('');
+  $('hsModal').hidden=false;
+}
+
+// ================= static monitor (present state, no time axis) =================
+function drawMonitor(){
+  const cv=$('scope'); if(!cv||!R.T) return; const {c,w,h}=prep(cv), T=R.T, ar=S.lang==='ar';
+  c.fillStyle='#03060a'; c.fillRect(0,0,w,h);
+  let items=[];
+  if(S.tab==='array'){
+    const Iref=R.mref.mpp.I; const mx=Math.max(Iref*1.15,...R.strI.map(v=>Math.abs(v)));
+    items=R.strI.map((I,k)=>({lab:'S'+(k+1),v:I,min:Math.min(0,-0.15*mx,I),max:mx,col:I<-0.05?'#ff6a5a':'#34d1a0',txt:fmt(I,2)+'A'}));
+    $('stateLg').textContent=ar?'تيار كل استرينج دلوقتي (أحمر = تيار عكسي)':'Current in each string right now (red = reverse current)';
+  } else if(T.kind==='csi'&&T.bypass){
+    const Vh=R.mref.mpp.V/T.nSub*1.25, Isc=R.mref.mpp.Isc;
+    R.mtr.subs.forEach((s,k)=>{ items.push({lab:'SS'+(k+1),v:s.V,min:-Vh*0.35,max:Vh,col:s.V<0?'#ff6a5a':'#5ea0ff',txt:fmt(s.V,1)+'V'});
+      items.push({lab:'D'+(k+1),v:s.bypass?s.Id:0,min:0,max:Isc,col:'#ffa23d',txt:s.bypass?fmt(s.Id,1)+'A':(ar?'مطفي':'off'),dim:!s.bypass}); });
+    $('stateLg').textContent=ar?'SS = فولت كل substring دلوقتي (أحمر = سالب) · D = تيار الـ bypass diode':'SS = voltage of each substring now (red = negative) · D = bypass diode current';
+  } else {
+    items=[{lab:'V',v:R.Vcur,min:0,max:R.mref.mpp.Voc*1.1,col:'#5ea0ff',txt:fmt(R.Vcur,1)+'V'},{lab:'I',v:R.Icur,min:0,max:R.mref.mpp.Isc*1.1,col:'#34d1a0',txt:fmt(R.Icur,2)+'A'},{lab:'P',v:R.Vcur*R.Icur,min:0,max:T.Pmax*1.1,col:'#ffa23d',txt:fmt(R.Vcur*R.Icur,0)+'W'}];
+    $('stateLg').textContent=ar?'قراءات اللوح دلوقتي (الثن فيلم مفيهوش substrings ولا bypass diodes)':'Module readings now (thin film has no substrings or bypass diodes)';
+  }
+  const n=items.length, cw=w/n, top=14, bot=h-14, H=bot-top;
+  c.font='600 10px "IBM Plex Mono",monospace'; c.textAlign='center'; c.textBaseline='middle';
+  items.forEach((it,i)=>{ const x0=i*cw, bw=Math.min(34,cw*0.5), bx=x0+cw/2-bw/2, Y=v=>top+(it.max-Math.max(it.min,Math.min(it.max,v)))/(it.max-it.min)*H, y0=Y(0), y1=Y(it.v);
+    c.fillStyle='#0e1620'; c.fillRect(bx,top,bw,H);
+    c.fillStyle=it.dim?'#2a3440':(it.v<0&&it.col!=='#ffa23d'?'#ff6a5a':it.col); c.fillRect(bx,Math.min(y0,y1),bw,Math.max(1.5,Math.abs(y1-y0)));
+    c.strokeStyle='#3a4757'; c.lineWidth=1; c.beginPath(); c.moveTo(bx-3,y0); c.lineTo(bx+bw+3,y0); c.stroke();
+    c.fillStyle='#8a9bb0'; c.fillText(it.lab,x0+cw/2,7); c.fillStyle=it.dim?'#5c6d80':'#e6edf5'; c.fillText(it.txt,x0+cw/2,h-6); });
+  c.textBaseline='alphabetic';
+}
+
+// ================= current flow overlay =================
+let FLOW=[], flowPhase=0, flowLast=0;
+function buildFlow(T,tr,cells){
+  FLOW=[]; if(!GEO) return; const g=GEO, Isc=R.mref?R.mref.mpp.Isc:T.Isc, col=v=>v<-0.05?'#ff6a5a':'#8ff5d2';
+  const mk=(pts,I,Imax,diode)=>{ const cum=[0]; for(let i=1;i<pts.length;i++) cum.push(cum[i-1]+Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y)); FLOW.push({pts,cum,L:cum[cum.length-1],I,Imax,diode}); };
+  if(T.kind==='csi'){ const cps=T.cols/T.nSub, hr=T.rows/T.Np;
+    tr.subs.forEach((s,k)=>{ for(let hh=0;hh<T.Np;hh++){ const pts=[]; let first=-1;
+        for(let j=0;j<cps;j++){ const cc=k*cps+j; const rows=[]; for(let r=hh*hr;r<(hh+1)*hr;r++) rows.push(r); if(j%2) rows.reverse();
+          rows.forEach(r=>{ const id=r*T.cols+cc, q=g.rects[id]; if(first<0) first=id; pts.push({x:q.x+q.w/2,y:q.y+q.h/2,c:col(cells[id].V)}); }); }
+        mk(pts,cells[first].I,Isc/T.Np,false); }
+      if(s.bypass){ const x0=g.rects[cps*k].x, x1=g.rects[cps*(k+1)-1].x+g.cw, y=g.mid?GEO.H/2:GEO.H-g.fr*0.6-4; mk([{x:x0,y,c:'#ffb347'},{x:x1,y,c:'#ffb347'}],s.Id,Isc,true); } });
+  } else { const r=Math.floor(T.rows/2), pts=[]; for(let cc=0;cc<T.cols;cc++){ const id=r*T.cols+cc, q=g.rects[id]; pts.push({x:q.x+q.w/2,y:q.y+q.h/2,c:col(cells[cellOf(T,id)].V)}); } mk(pts,R.Icur,Isc,false); }
+}
+function drawFlow(now){
+  const cv=$('flowCv'); if(!cv) return; const dt=Math.min(0.1,(now-(flowLast||now))/1000); flowLast=now;
+  const {c}=prep(cv); if(!S.flow||S.tab!=='module') return; flowPhase+=dt;
+  FLOW.forEach(f=>{ if(f.L<1) return; const sp=80*Math.min(1.6,Math.abs(f.I)/Math.max(f.Imax,1e-6)); if(sp<1) return; const gap=f.diode?14:24, off=(flowPhase*sp)%gap;
+    for(let d=off; d<f.L; d+=gap){ let i=1; while(i<f.cum.length&&f.cum[i]<d) i++; if(i>=f.pts.length) break;
+      const a=f.pts[i-1], b=f.pts[i], seg=f.cum[i]-f.cum[i-1]||1, u=(d-f.cum[i-1])/seg, x=a.x+(b.x-a.x)*u, y=a.y+(b.y-a.y)*u;
+      c.beginPath(); c.arc(x,y,f.diode?3:2.3,0,7); c.fillStyle=b.c; c.shadowColor=b.c; c.shadowBlur=6; c.fill(); } });
+  c.shadowBlur=0;
+}
+
+// ================= IR camera view =================
+const IRON=[[0,[4,2,18]],[0.15,[40,6,110]],[0.35,[140,10,140]],[0.55,[222,52,40]],[0.75,[255,145,10]],[0.9,[255,222,70]],[1,[255,255,235]]];
+function iron(x){ x=Math.max(0,Math.min(1,x)); for(let i=1;i<IRON.length;i++) if(x<=IRON[i][0]){ const a=IRON[i-1],b=IRON[i],f=(x-a[0])/(b[0]-a[0]); return a[1].map((q,k)=>Math.round(q+(b[1][k]-q)*f)); } return IRON[IRON.length-1][1]; }
+let IRR={lo:0,hi:1};
+function drawIR(c,T,cells){
+  const g=GEO; let lo=1e9,hi=-1e9; g.rects.forEach((r,i)=>{ const v=cells[cellOf(T,i)].Th; lo=Math.min(lo,v); hi=Math.max(hi,v); });
+  if(hi-lo<8){ const m=(hi+lo)/2; lo=m-4; hi=m+4; } lo=lo-(hi-lo)*0.45; IRR={lo,hi};
+  const off=document.createElement('canvas'); off.width=T.cols; off.height=T.rows; const oc=off.getContext('2d'), im=oc.createImageData(T.cols,T.rows);
+  for(let i=0;i<T.cols*T.rows;i++){ const v=cells[cellOf(T,i)].Th, rgb=iron((v-lo)/(hi-lo)); im.data[i*4]=rgb[0]; im.data[i*4+1]=rgb[1]; im.data[i*4+2]=rgb[2]; im.data[i*4+3]=255; }
+  oc.putImageData(im,0,0); c.save(); c.imageSmoothingEnabled=true; c.imageSmoothingQuality='high';
+  const r0=g.rects[0], rl=g.rects[g.rects.length-1]; c.drawImage(off,r0.x,r0.y,rl.x+rl.w-r0.x,rl.y+rl.h-r0.y); c.restore();
+  if(T.kind==='csi'){ c.strokeStyle='rgba(0,0,0,.22)'; c.lineWidth=1; g.rects.forEach(q=>c.strokeRect(q.x+0.5,q.y+0.5,q.w-1,q.h-1)); }
+  let hiI=0; g.rects.forEach((r,i)=>{ if(cells[cellOf(T,i)].Th>cells[cellOf(T,hiI)].Th) hiI=i; });
+  const r=g.rects[hiI], cx=r.x+r.w/2, cy=r.y+r.h/2; c.strokeStyle='#fff'; c.lineWidth=1.5;
+  c.beginPath(); c.moveTo(cx-10,cy); c.lineTo(cx-3,cy); c.moveTo(cx+3,cy); c.lineTo(cx+10,cy); c.moveTo(cx,cy-10); c.lineTo(cx,cy-3); c.moveTo(cx,cy+3); c.lineTo(cx,cy+10); c.stroke();
+  c.font='600 11px "IBM Plex Mono",monospace'; c.textAlign='left'; const txt='max '+fmt(hi,1)+'°C', tw=c.measureText(txt).width+8, tx=Math.min(GEO.W-tw-4,cx+12), ty=Math.max(4,cy-22);
+  c.fillStyle='rgba(0,0,0,.7)'; c.fillRect(tx,ty,tw,16); c.fillStyle='#fff'; c.fillText(txt,tx+4,ty+12);
+}
+
+// ================= cell inspector =================
+function renderInspector(){
+  const card=$('inspCard'); if(!card) return; const T=R.T;
+  if(S.tab!=='module'||S.insp==null||!R.mtr){ card.hidden=true; return; } card.hidden=false;
+  const ar=S.lang==='ar', id=cellOf(T,S.insp), cell=R.mr.cells[id], op=R.mtr.cells[id];
+  $('inspName').textContent=(ar?'فحص الخلية: ':'Cell inspector: ')+cellName(T,S.insp);
+  const Cg=eng.Cg, cv=eng.cellCurve(cell), p0=cellParams(T,S.env.G,cell.T,1,0), v0=Array.from(Cg,I=>cellV(I,p0));
+  const xmin=Math.floor((T.vbr-1)/2)*2, ymax=Math.max(...Array.from(Cg).filter((I,i)=>v0[i]>xmin))*1.05;
+  const pick=V=>{ const x=[],y=[]; for(let i=0;i<Cg.length;i++){ if(Cg[i]<0||V[i]<xmin||V[i]>1) continue; x.push(V[i]); y.push(Cg[i]); } return {x,y}; };
+  const a=pick(cv), b=pick(v0), rev=op.V<-0.05;
+  chart($('cellCv'),{xmin,xmax:1,xs:{step:2,max:1-xmin},ymax,ys:nice(ymax),xl:ar?'جهد الخلية [V]':'Cell voltage [V]',yl:'I [A]',band:[xmin,0],bandc:'rgba(255,90,74,.08)',
+    series:[{x:b.x,y:b.y,c:'#6f8193',w:1.2,dash:[4,4]},{x:a.x,y:a.y,c:'#34d1a0',w:2.2}],
+    marks:[{x:op.V,y:op.I,c:rev?'#ff5a4a':'#5ea0ff',r:5,label:fmt(op.V,2)+' V · '+fmt(op.I,2)+' A'}]});
+  const P=op.V*op.I;
+  $('inspMetrics').innerHTML=[metric(ar?'الإشعاع':'Irradiance',cell.G,'W/m²'),metric('V',fmt(op.V,2),'V',rev?'bad':''),metric('I',fmt(op.I,2),'A'),
+    metric(ar?'القدرة':'Power',fmt(P,1),'W',P<-0.5?'bad':'good'),metric(ar?'الحرارة':'Temp',fmt(op.Th,0),'°C',op.Th>85?'warn':'')].join('');
+  const Iph=p0.Iph*cell.G/Math.max(S.env.G,1);
+  $('inspText').textContent=rev
+    ?(ar?`الخلية في المنطقة العكسية (يسار الصفر): التيار المفروض عليها ${fmt(op.I,2)} A أكبر من اللي تقدر تولده (حوالي ${fmt(Iph,2)} A)، فجهدها بقى ${fmt(op.V,2)} V وبتستهلك ${fmt(-P,1)} W بدل ما تنتج. المنحنى المتقطع هو نفس الخلية من غير ظل.`
+        :`The cell is in the reverse region (left of zero): the current forced through it, ${fmt(op.I,2)} A, is more than it can generate (about ${fmt(Iph,2)} A), so its voltage is ${fmt(op.V,2)} V and it absorbs ${fmt(-P,1)} W instead of producing. The dashed curve is the same cell without shade.`)
+    :(ar?`الخلية شغالة طبيعي (يمين الصفر): بتنتج ${fmt(P,2)} W عند ${fmt(op.V,2)} V و ${fmt(op.I,2)} A. المنحنى المتقطع هو نفس الخلية من غير ظل.`
+        :`The cell works normally (right of zero): it produces ${fmt(P,2)} W at ${fmt(op.V,2)} V and ${fmt(op.I,2)} A. The dashed curve is the same cell without shade.`);
+}
+
+// ================= compare: saved state A vs now =================
+function saveA(){ const T=R.T, mr=R.mr; const P=R.Vcur*R.Icur; let hot=0,ts=0; R.mtr.cells.forEach(c=>{ hot=Math.max(hot,c.Th); ts+=c.T; });
+  const Ig=eng.Ig, x=[],y=[],p=[]; for(let i=0;i<Ig.length;i++){ if(Ig[i]<0||mr.V[i]<0) continue; x.push(mr.V[i]); y.push(Ig[i]); p.push(mr.V[i]*Ig[i]); }
+  S.snapA={P,V:R.Vcur,I:R.Icur,Voc:mr.mpp.Voc,Isc:mr.mpp.Isc,FF:mr.mpp.P/(mr.mpp.Voc*mr.mpp.Isc)*100,hot,tmod:ts/R.mtr.cells.length,
+    D:T.bypass?R.mtr.subs.filter(s=>s.bypass).length:0,x,y,p,tech:T.tech}; schedule(); }
+function renderCompareA(cur){
+  const box=$('cmpA'); if(!S.snapA){ box.hidden=true; $('clrA').hidden=true; return; } box.hidden=false; $('clrA').hidden=false;
+  const A=S.snapA, ar=S.lang==='ar';
+  const rows=[[ar?'القدرة':'Power','P','W',0,1],['V','V','V',2,0],['I','I','A',2,0],['Voc','Voc','V',2,0],['Isc','Isc','A',2,0],['FF','FF','%',1,1],[ar?'أسخن خلية':'Hottest cell','hot','°C',0,-1],[ar?'حرارة اللوح':'Module temp','tmod','°C',1,-1],[ar?'دايودات شغالة':'Diodes on','D','',0,0]];
+  box.innerHTML=`<table><tr><th></th><th class="num">A</th><th class="num">${ar?'دلوقتي':'Now'}</th><th class="num">Δ</th></tr>`+rows.map(([lab,k,u,d,good])=>{ const a=A[k], b=cur[k], dv=b-a;
+    const cls=Math.abs(dv)<1e-9||!good?'':(dv*good>0?'pass':'fail');
+    return `<tr><td>${lab}</td><td class="num mono">${fmt(a,d)} ${u}</td><td class="num mono">${fmt(b,d)} ${u}</td><td class="num mono ${cls}">${dv>0?'+':''}${fmt(dv,d)}</td></tr>`; }).join('')+'</table>';
+}
+
 const PRESETS={pBottom:[[0,0.93,1,1,1]],pHalf:[[0,0.5,1,1,0.8]],pBird:[[0.42,0.27,0.58,0.32,0.9]],pPole:[[0.47,0,0.55,1,0.75]],pSide:[[0,0,0.17,1,1]],pCorner:[[0.66,0.76,1,1,1]]};
-function presetShade(T,name){ const sh=new Float32Array(T.cols*T.rows), mid=(T.kind==='csi'&&T.Np===2)?0.022:0, ch=(1-mid)/T.rows;
+function presetShade(T,name){ if(name==='pBird'){ const sh=new Float32Array(T.cols*T.rows); sh[hotCellIndex(T)]=0.7; return sh; }
+ const sh=new Float32Array(T.cols*T.rows), mid=(T.kind==='csi'&&T.Np===2)?0.022:0, ch=(1-mid)/T.rows;
   for(let r=0;r<T.rows;r++) for(let c=0;c<T.cols;c++){ const x0=c/T.cols,x1=(c+1)/T.cols, y0=r*ch+(mid&&r>=T.rows/2?mid:0), y1=y0+ch; let s=0;
     PRESETS[name].forEach(([a,b,cc,d,o])=>{ const ox=Math.max(0,Math.min(x1,cc)-Math.max(x0,a)), oy=Math.max(0,Math.min(y1,d)-Math.max(y0,b)); s=Math.max(s,o*ox*oy/((x1-x0)*(y1-y0))); });
     sh[r*T.cols+c]=Math.round(Math.min(1,s)*20)/20; }
@@ -871,9 +1076,8 @@ function drawScope(){
 }
 function meterLoop(now){
   ['V','I','P'].forEach(k=>{ const m=MET[k]; m.v+=(m.t-m.v)*0.18; });
-  if(!scopePaused&&now-lastSample>100){ lastSample=now; HIST.push({t:now,V:MET.V.t,I:MET.I.t,P:MET.P.t,T:MET.T.t}); while(HIST.length&&now-HIST[0].t>21000) HIST.shift(); }
-  if(S.tab==='module'||S.tab==='array'){ drawGauge($('gV'),'V','V',MET.V.v,FS.V,'#5ea0ff'); drawGauge($('gI'),'I','A',MET.I.v,FS.I,'#34d1a0'); drawGauge($('gP'),'P','W',MET.P.v,FS.P,'#ffa23d'); drawScope();
-    $('lgV').textContent='V '+fmt(MET.V.t,1); $('lgI').textContent='I '+fmt(MET.I.t,2); $('lgP').textContent='P '+fmt(MET.P.t,0); $('lgTh').textContent='T_hot '+fmt(MET.T.t,0)+'°C'; }
+  if(S.tab==='module'||S.tab==='array'){ drawGauge($('gV'),'V','V',MET.V.v,FS.V,'#5ea0ff'); drawGauge($('gI'),'I','A',MET.I.v,FS.I,'#34d1a0'); drawGauge($('gP'),'P','W',MET.P.v,FS.P,'#ffa23d'); }
+  drawFlow(now);
   requestAnimationFrame(meterLoop);
 }
 function setMeters(V,I,P,fs,Th){ MET.V.t=V; MET.I.t=I; MET.P.t=P; MET.T.t=Th; FS={V:nice(fs.V).max,I:nice(fs.I).max,P:nice(fs.P).max}; }
@@ -900,7 +1104,7 @@ function renderModule(){
   const xmax=Math.max(ref.mpp.Voc,mr.mpp.Voc)*1.05, ymax=Math.max(ref.mpp.Isc,mr.mpp.Isc,0.1)*1.12, y2max=Math.max(ref.mpp.P,mr.mpp.P,1)*1.15;
   const ca=cssv('--amp'), cp=cssv('--pwr');
   chart($('ivMod'),{xmax,ymax,y2max,xl:'V',yl:'I [A]',y2l:'P [W]',ylc:ca,y2lc:cp,
-    series:[{x:b.x,y:b.y,c:ca,w:1.1,dash:[4,4]},{x:b.x,y:b.p,c:cp,w:1.1,dash:[4,4],ax:'y2'},{x:a.x,y:a.p,c:cp,w:2.2,ax:'y2',fill:'rgba(255,162,61,.12)'},{x:a.x,y:a.y,c:ca,w:2.4}],
+    series:[{x:b.x,y:b.y,c:ca,w:1.1,dash:[4,4]},{x:b.x,y:b.p,c:cp,w:1.1,dash:[4,4],ax:'y2'},...(S.snapA?[{x:S.snapA.x,y:S.snapA.y,c:'#b388ff',w:1.5,dash:[2,3]},{x:S.snapA.x,y:S.snapA.p,c:'#b388ff',w:1.5,dash:[2,3],ax:'y2'}]:[]),{x:a.x,y:a.p,c:cp,w:2.2,ax:'y2',fill:'rgba(255,162,61,.12)'},{x:a.x,y:a.y,c:ca,w:2.4}],
     marks:[{x:mr.mpp.V,y:mr.mpp.P,ax:'y2',c:cp,label:fmt(mr.mpp.P,0)+' W'},{x:R.Vcur,y:R.Icur,c:ca,r:4}]});
   const ff=mr.mpp.P/(mr.mpp.Voc*mr.mpp.Isc);
   $('modMetrics').innerHTML=[metric('V',fmt(R.Vcur,2),'V'),metric('I',fmt(R.Icur,2),'A'),metric(t('Voc'),fmt(mr.mpp.Voc,2),'V'),metric(t('Isc'),fmt(mr.mpp.Isc,2),'A'),
@@ -908,16 +1112,99 @@ function renderModule(){
   $('bypChips').innerHTML=T.bypass?R.mtr.subs.map((s,k)=>`<span class="chip ${s.bypass?'on':'ok'}">D${k+1} ${s.bypass?t('on')+' '+fmt(s.Id,1)+'A':t('off')}</span>`).join(''):`<span class="chip">${t('none')}</span>`;
   setMeters(R.Vcur,R.Icur,P,{V:ref.mpp.Voc*1.15,I:ref.mpp.Isc*1.15,P:Math.max(ref.mpp.P,T.Pmax)*1.15},hotT);
   $('benchSrc').textContent=S.ctx==='iso'?t('iso'):t('inarr'); $('benchOp').textContent=`${T.brand} ${T.model}`;
-  $('insights').innerHTML=moduleInsights(T,mr,ref,hotT,pd,shL,tL).map(s=>`<li>${s}</li>`).join('');
+  drawMonitor(); renderInspector();
+  renderCompareA({P,V:R.Vcur,I:R.Icur,Voc:mr.mpp.Voc,Isc:mr.mpp.Isc,FF:ff*100,hot:hotT,tmod,D:T.bypass?R.mtr.subs.filter(s=>s.bypass).length:0});
+  const snap=takeSnap(T,P,ref);
+  if(PREV&&PREV.key===snap.key){ const ch=explainChange(T,PREV,snap); if(ch.length) CHANGES=ch; } else CHANGES=[];
+  PREV=snap;
+  const hdr=t=>`<li class="ih">${t}</li>`, ar=S.lang==='ar';
+  $('insights').innerHTML=(CHANGES.length?hdr(ar?'اللي اتغير ودلوقتي ليه':'What just changed, and why')+CHANGES.map(x=>`<li class="chg">${x}</li>`).join(''):'')
+    +hdr(ar?'الحالة الحالية':'Current state')+stateLines(T,snap).map(x=>`<li>${x}</li>`).join('')
+    +moduleInsights(T,mr,ref,hotT,pd,shL,tL).map(s=>`<li>${s}</li>`).join('');
   renderTilt(fmt(P,0),'W');
 }
+let PREV=null, CHANGES=[];
+function cellName(T,i){ return T.kind==='csi'?(S.lang==='ar'?`صف ${Math.floor(i/T.cols)+1} عمود ${i%T.cols+1}`:`row ${Math.floor(i/T.cols)+1}, col ${i%T.cols+1}`):(S.lang==='ar'?`الشريحة ${i%T.cols+1}`:`strip group ${i%T.cols+1}`); }
+function takeSnap(T,P,ref){
+  const tr=R.mtr, cells=tr.cells; let hi=0; cells.forEach((c,i)=>{ if(c.Th>cells[hi].Th) hi=i; });
+  const subs=R.mr.subs.map((s,k)=>{ const ids=s.halves.flatMap(h=>h.ids); let w=ids[0];
+    ids.forEach(id=>{ const a=R.mr.cells[id], b=R.mr.cells[w]; if(a.G*a.s*(a.d===1?0.6:1)<b.G*b.s*(b.d===1?0.6:1)) w=id; });
+    return {on:tr.subs[k].bypass, Id:tr.subs[k].Id, Ilim:Math.max(0,invDec(eng.Ig,s.raw,0)), weak:w, Vs:tr.subs[k].V, revN:ids.filter(id=>cells[id].V<-0.5).length}; });
+  const m=selMod();
+  return {key:[S.tech,T.Np,S.sel.s,S.sel.m,S.tab,S.lang].join('|'), ctx:S.ctx, G:S.env.G, Ta:S.env.Tamb, sh:eng.modKey(m,0),
+    I:R.Icur, V:R.Vcur, P, Iref:ref.mpp.Isc, subs, hot:{i:hi,T:cells[hi].Th,V:cells[hi].V,I:cells[hi].I,Pd:cells[hi].Pd},
+    tmod:cells.reduce((a,c)=>a+c.T,0)/cells.length, cells:cells.map(c=>({T:c.Th,V:c.V,I:c.I,Pd:c.Pd}))};
+}
+function stateLines(T,b){
+  const ar=S.lang==='ar', out=[], A=v=>fmt(v,2)+' A';
+  if(T.kind==='csi'&&T.bypass){ b.subs.forEach((s,k)=>{ const shaded=s.Ilim<b.Iref*0.95;
+    if(s.on) out.push(ar?`D${k+1} شغال: الـ substring ${k+1} أقصى تيار يقدر يعدّيه ${A(s.Ilim)} بسبب الخلية الأضعف (${cellName(T,s.weak)})، والتيار المطلوب ${A(b.I)}، فالدايود بيعدّي الفرق ${A(s.Id)} حوالين الـ substring.`
+      :`D${k+1} is ON: substring ${k+1} can pass at most ${A(s.Ilim)} because of its weakest cell (${cellName(T,s.weak)}), but the module needs ${A(b.I)}, so the diode carries the remaining ${A(s.Id)} around it.`);
+    else if(shaded&&s.Ilim<b.I) out.push(ar?`D${k+1} مطفي، وده أسوأ وضع: الـ substring ${k+1} محتاج ${A(b.I)} ويقدر يعدّي ${A(s.Ilim)} بس، ففولته واقف عند ${fmt(s.Vs,2)} V، على حافة فتح الدايود بالظبط، فالدايود مش بيعدّي تقريباً أي تيار، والخلية المغطاة بتشيل الجهد العكسي كله لوحدها وتسخن.`
+      :`D${k+1} is OFF, and that is the worst case: substring ${k+1} needs ${A(b.I)} but can pass only ${A(s.Ilim)}, so its voltage sits at ${fmt(s.Vs,2)} V, right at the diode's turn-on edge. The diode carries almost nothing, and the covered cell takes nearly all the reverse stress on its own and heats up.`);
+    else if(shaded) out.push(ar?`D${k+1} مطفي رغم الظل: الـ substring ${k+1} لسه يقدر يعدّي ${A(s.Ilim)} وده أكبر من التيار الحالي ${A(b.I)}، ففولته موجب ومفيش داعي للدايود يفتح.`
+      :`D${k+1} is OFF despite the shade: substring ${k+1} can still pass ${A(s.Ilim)}, more than the present ${A(b.I)}, so its voltage stays positive and the diode has no reason to conduct.`); }); }
+  if(T.kind==='csi'){ R.mr.subs.forEach((s,k)=>{ const ids=s.halves.flatMap(h=>h.ids), rev=ids.filter(id=>R.mtr.cells[id].V<-0.5);
+    if(rev.length>=2){ const v=rev.reduce((a,id)=>a+R.mtr.cells[id].V,0)/rev.length, pd=rev.reduce((a,id)=>a+R.mtr.cells[id].Pd,0);
+      out.push(ar?`${rev.length} خلايا مظللة في الـ substring ${k+1} بيتقسم عليهم الجهد العكسي (حوالي ${fmt(v,1)} V لكل واحدة)، فكلهم مع بعض بيبددوا ${fmt(pd,1)} W بس، وبيفضلوا أبرد من خلية واحدة مظللة لوحدها.`
+        :`${rev.length} shaded cells in substring ${k+1} share the reverse voltage (about ${fmt(v,1)} V each), so together they dissipate only ${fmt(pd,1)} W and stay cooler than a single shaded cell would.`); } }); }
+  if(T.kind!=='csi'&&b.sh.split('#')[0]) out.push(ar?'مفيش bypass diodes في الثن فيلم: كل الشرايح على التوالي، فتيار اللوح كله ماشي بالشريحة الأكتر ظل.':'Thin film has no bypass diodes: all strips are in series, so the whole module current follows the most shaded strip.');
+  const h=b.hot; if(h.Pd>0.5) out.push(ar?`أسخن خلية (${cellName(T,h.i)}) حرارتها ${fmt(h.T,0)}°C: جهدها ${fmt(h.V,2)} V يعني عكسي، وبيعدّي فيها ${A(h.I)}، فبدل ما تنتج قدرة بتبدد ${fmt(h.Pd,1)} W حرارة (|V| × I).`
+    :`Hottest cell (${cellName(T,h.i)}) is at ${fmt(h.T,0)}°C: it sits at ${fmt(h.V,2)} V (reverse) while ${A(h.I)} flows through it, so instead of producing power it dissipates ${fmt(h.Pd,1)} W as heat (|V| × I).`);
+  return out;
+}
+function explainChange(T,a,b){
+  const ar=S.lang==='ar', out=[], A=v=>fmt(v,2)+' A', rel=(x,y)=>Math.abs(x-y)/Math.max(Math.abs(x),Math.abs(y),1e-6);
+  const dG=a.G!==b.G, dT=a.Ta!==b.Ta, dSh=a.sh!==b.sh, dCtx=a.ctx!==b.ctx;
+  const nOnA=a.subs.filter(s=>s.on).length, nOnB=b.subs.filter(s=>s.on).length;
+  b.subs.forEach((s,k)=>{ const p=a.subs[k]; if(!p) return;
+    if(!p.on&&s.on) out.push(ar?`D${k+1} اشتغل: الـ substring ${k+1} بقى أقصى تيار يعدّيه ${A(s.Ilim)} بس، والتيار المطلوب ${A(b.I)}. الخلايا المظللة اتعكس جهدها لحد ما فولت الـ substring وصل حوالي −0.4 V، فالدايود فتح وبقى يعدّي ${A(s.Id)} حواليهم.`
+      :`D${k+1} turned ON: substring ${k+1} can now pass only ${A(s.Ilim)}, but the module current is ${A(b.I)}. Its shaded cells were driven into reverse until the substring reached about −0.4 V, so the diode opened and now carries ${A(s.Id)} around them.`);
+    if(p.on&&!s.on){ const allLim=b.subs.every(q=>q.Ilim<b.Iref*0.9);
+      if(b.I<a.I*0.97&&s.Ilim<=p.Ilim*1.02) out.push(ar?`D${k+1} طفي: نقطة التشغيل نزلت لتيار أقل (${A(a.I)} ← ${A(b.I)})${allLim?'، لأن كل الـ substrings بقت مظللة، ولو اتعمل لهم bypass كلهم الفولت هيبقى تقريباً صفر، فأحسن نقطة إن اللوح يمشي على تيار الخلايا المظللة':''}. عند التيار ده الـ substring ${k+1} يقدر يعدّيه بنفسه (حده ${A(s.Ilim)})، ففولته رجع موجب والدايود قفل.`
+        :`D${k+1} turned OFF: the operating point moved to a lower current (${A(a.I)} → ${A(b.I)})${allLim?". Every substring is now shaded, and bypassing them all would leave almost no voltage, so the best point is to run at the shaded cells' current":''}. At this current substring ${k+1} can carry it by itself (limit ${A(s.Ilim)}), so its voltage is positive again and the diode closed.`);
+      else out.push(ar?`D${k+1} طفي: الـ substring ${k+1} بقى يقدر يعدّي ${A(s.Ilim)} (كان ${A(p.Ilim)})، وده كفاية للتيار الحالي ${A(b.I)}، فمبقاش محتاج bypass.`
+        :`D${k+1} turned OFF: substring ${k+1} can now pass ${A(s.Ilim)} (was ${A(p.Ilim)}), enough for the present ${A(b.I)}, so it no longer needs bypassing.`); } });
+  if(rel(a.I,b.I)>0.03){ let why;
+    if(dCtx) why=b.ctx==='arr'?(ar?'الاسترينج دلوقتي هو اللي بيفرض التيار على اللوح، مش أحسن نقطة للوح لوحده':"the string now forces its current through the module instead of the module's own best point"):(ar?'اللوح رجع يشتغل على أحسن نقطة ليه لوحده':"the module is back at its own best operating point");
+    else if(dG) why=ar?`الإشعاع اتغير (${a.G} ← ${b.G} W/m²)، وتيار الخلية بيتناسب طردياً مع الإشعاع`:`irradiance changed (${a.G} → ${b.G} W/m²), and cell current is proportional to irradiance`;
+    else if(dSh&&nOnB>nOnA&&b.I>a.I) why=ar?'الـ substring المظلل اتعمله bypass، فمبقاش بيحدد التيار واللوح رجع يشتغل قرب تياره الكامل':'the shaded substring is now bypassed, so it no longer limits the current and the module runs near full current again';
+    else if(dSh&&b.I<a.I) why=ar?`الخلايا المظللة مش قادرة تعدّي أكتر من حوالي ${A(Math.min(...b.subs.map(s=>s.Ilim)))}، وعند أحسن نقطة اللوح بيمشي على تيارها بدل ما يعمل لها bypass`:`the shaded cells cannot pass more than about ${A(Math.min(...b.subs.map(s=>s.Ilim)))}, and at the best point the module follows their current rather than bypassing them`;
+    else if(dSh) why=ar?'الظل أو العيوب اتغيرت، فحد التيار للخلايا الأضعف اتغير':'the shading or defects changed, which changed the current limit of the weakest cells';
+    else if(dT) why=ar?`حرارة الخلايا اتغيرت، والتيار بيزيد شوية مع الحرارة (+${T.aIsc}%/°C)`:`cell temperature changed; current rises slightly with temperature (+${T.aIsc}%/°C)`;
+    if(why) out.push(ar?`التيار ${A(a.I)} ← ${A(b.I)}: لأن ${why}.`:`Current ${A(a.I)} → ${A(b.I)} because ${why}.`); }
+  if(rel(a.V,b.V)>0.03){ let why;
+    if(nOnB!==nOnA) why=ar?`عدد الـ substrings اللي عليها bypass اتغير (${nOnA} ← ${nOnB})، وكل واحد بيشيل حوالي ${fmt(100/T.nSub,0)}% من فولت اللوح`:`the number of bypassed substrings changed (${nOnA} → ${nOnB}); each one removes about ${fmt(100/T.nSub,0)}% of the module voltage`;
+    else if(dT||Math.abs(a.tmod-b.tmod)>2) why=ar?`حرارة الخلايا اتغيرت (${fmt(a.tmod,0)} ← ${fmt(b.tmod,0)}°C)، والفولت بيتغير ${T.bVoc}%/°C`:`cell temperature changed (${fmt(a.tmod,0)} → ${fmt(b.tmod,0)}°C), and voltage changes by ${T.bVoc}%/°C`;
+    else if(rel(a.I,b.I)>0.03) why=ar?'نقطة التشغيل اتحركت على منحنى I-V: تيار أقل يعني فولت أعلى والعكس':'the operating point moved along the I-V curve: lower current means higher voltage and vice versa';
+    if(why) out.push(ar?`الفولت ${fmt(a.V,1)} ← ${fmt(b.V,1)} V: لأن ${why}.`:`Voltage ${fmt(a.V,1)} → ${fmt(b.V,1)} V because ${why}.`); }
+  if(Math.abs(a.hot.T-b.hot.T)>3){ const up=b.hot.T>a.hot.T, ci=up?b.hot.i:a.hot.i, ca=a.cells[ci], cb=b.cells[ci]; let why;
+    if(ca&&cb&&Math.abs(ca.Pd-cb.Pd)>1){
+      if(nOnB>nOnA&&cb.Pd<ca.Pd) why=ar?`لما الدايود فتح، الجهد العكسي على الخلية المظللة اتحدد (${fmt(ca.V,1)} ← ${fmt(cb.V,1)} V)، فالحرارة اللي بتبددها نزلت من ${fmt(ca.Pd,1)} لـ ${fmt(cb.Pd,1)} W`
+        :`once the diode opened, the reverse voltage on the shaded cell was capped (${fmt(ca.V,1)} → ${fmt(cb.V,1)} V), so the heat it dissipates fell from ${fmt(ca.Pd,1)} to ${fmt(cb.Pd,1)} W`;
+      else if(nOnB<nOnA&&cb.Pd<ca.Pd) why=ar?`تيار اللوح نزل لـ ${A(b.I)}، والخلايا السليمة جنبها بتقدر تشيله، فالتيار اللي كان بيتزق في الخلية المظللة بالعكس نزل (${A(ca.I)} ← ${A(cb.I)}) وجهدها العكسي قلّ (${fmt(ca.V,1)} ← ${fmt(cb.V,1)} V)، فبطّلت تبدد حرارة (${fmt(ca.Pd,1)} ← ${fmt(cb.Pd,1)} W)`
+        :`the module current dropped to ${A(b.I)}, which the healthy cells next to it can carry, so the current forced through the shaded cell fell (${A(ca.I)} → ${A(cb.I)}) and its reverse voltage fell (${fmt(ca.V,1)} → ${fmt(cb.V,1)} V), so it stopped dissipating heat (${fmt(ca.Pd,1)} → ${fmt(cb.Pd,1)} W)`;
+      else if(nOnB<nOnA&&cb.Pd>ca.Pd) why=ar?`لما الدايود قفل، الخلية المظللة بقت هي اللي شايلة التيار بجهد عكسي ${fmt(cb.V,1)} V، فبقت تبدد ${fmt(cb.Pd,1)} W`
+        :`once the diode closed, the shaded cell had to carry the current at ${fmt(cb.V,1)} V reverse, so it now dissipates ${fmt(cb.Pd,1)} W`;
+      else if(cb.Pd<ca.Pd&&cb.V<-0.5&&b.subs.some(q=>q.revN>=2)) why=ar?`بقت بتتقاسم الجهد العكسي مع خلية مظللة تانية في نفس الـ substring (${fmt(ca.V,1)} ← ${fmt(cb.V,1)} V)، وعند الجهد ده يكاد مفيش تيار عكسي يعدّي (${A(ca.I)} ← ${A(cb.I)})، فالحرارة اللي بتبددها نزلت من ${fmt(ca.Pd,1)} لـ ${fmt(cb.Pd,1)} W والدايود بقى شايل التيار`
+        :`it now shares the reverse voltage with another shaded cell in the same substring (${fmt(ca.V,1)} → ${fmt(cb.V,1)} V), and at that voltage almost no reverse current flows (${A(ca.I)} → ${A(cb.I)}), so its dissipation fell from ${fmt(ca.Pd,1)} to ${fmt(cb.Pd,1)} W and the diode now carries the current`;
+      else why=ar?`القدرة المبددة فيها اتغيرت (${fmt(ca.Pd,1)} ← ${fmt(cb.Pd,1)} W = |V| × I = ${fmt(Math.abs(cb.V),1)} V × ${A(cb.I)})`
+        :`the power it dissipates changed (${fmt(ca.Pd,1)} → ${fmt(cb.Pd,1)} W = |V| × I = ${fmt(Math.abs(cb.V),1)} V × ${A(cb.I)})`; }
+    else if(dT) why=ar?`حرارة الجو اتغيرت (${a.Ta} ← ${b.Ta}°C)`:`ambient temperature changed (${a.Ta} → ${b.Ta}°C)`;
+    else if(dG) why=ar?'الإشعاع اتغير، فتسخين الشمس للخلايا اتغير':'irradiance changed, so solar heating of the cells changed';
+    const t0=ca?ca.T:a.hot.T, t1=cb?cb.T:b.hot.T;
+    if(why) out.push(ar?`الخلية (${cellName(T,ci)}) ${t1>t0?'سخنت':'بردت'} (${fmt(t0,0)} ← ${fmt(t1,0)}°C): لأن ${why}.`:`Cell (${cellName(T,ci)}) ${t1>t0?'heated up':'cooled down'} (${fmt(t0,0)} → ${fmt(t1,0)}°C) because ${why}.`); }
+  if(!out.length&&dCtx) out.push(ar?(b.ctx==='arr'?`حطينا اللوح جوه المصفوفة: الاسترينج بيفرض تيار ${A(b.I)} (كان ${A(a.I)} على أحسن نقطة للوح لوحده)، والفرق صغير فالقراءات متغيرتش كتير.`:`رجعنا للوح لوحده على أحسن نقطة ليه: ${A(b.I)} (كان ${A(a.I)} جوه الاسترينج)، والفرق صغير.`)
+    :(b.ctx==='arr'?`Placed inside the array: the string sets the current to ${A(b.I)} (was ${A(a.I)} at the module's own best point). The difference is small, so the readings barely moved.`:`Back to the module alone at its own best point: ${A(b.I)} (was ${A(a.I)} inside the string). The difference is small.`));
+  if(out.length&&rel(a.P,b.P)>0.01) out.push(ar?`القدرة ${fmt(a.P,0)} ← ${fmt(b.P,0)} W.`:`Power ${fmt(a.P,0)} → ${fmt(b.P,0)} W.`);
+  return out;
+}
+
 function moduleInsights(T,mr,ref,hotT,pd,loss,tL){
   const ar=S.lang==='ar', out=[], subsOn=R.mtr.subs.filter(s=>s.bypass).length, m=selMod();
   const anyShade=m.shade.some(x=>x>0), anyDef=m.defect.some(x=>x>0);
   let hot=null; R.mtr.cells.forEach(c=>{ if(!hot||c.Th>hot.Th) hot=c; });
   if(!anyShade&&!anyDef&&m.soil===0&&m.gf===1) out.push(ar?'اللوح نضيف. ظلّل خلايا أو اختار ظل جاهز وراقب العدادات والـ scope.':'The module is clean. Paint some shade or pick a preset and watch the meters and scope.');
-  if(subsOn) out.push(ar?`${subsOn} من ${T.nSub} bypass diode شغالين: كل substring متقفل بيشيل ~${fmt(100/T.nSub,0)}% من الفولت، بس بيحمي الخلية المظللة.`:`${subsOn} of ${T.nSub} bypass diodes conduct: each bypassed substring removes ~${fmt(100/T.nSub,0)}% of the voltage but protects the shaded cell.`);
-  if(T.kind==='csi'&&anyShade&&!subsOn&&loss>3) out.push(ar?'الـ bypass مش شغال عند نقطة التشغيل دي: الخلية الأضعف بتحدد تيار الـ substring كله، والمظللة رايحة reverse bias.':'No bypass diode conducts at this point: the weakest cell limits the substring current and the shaded cell goes into reverse bias.');
   if(T.kind==='strip'&&anyShade) out.push(ar?'الثن فيلم: شرايح بطول اللوح كلها توالي. الظل اللي بيقطع الشرايح بالعرض خسارته نسبية، أما اللي بيغطي شرايح بطولها بيخنق التيار.':'Thin film: strips run the module length, all in series. Shade across the strips costs proportionally; shade along whole strips chokes the current.');
   if(hotT>85) out.push(ar?`Hot spot ${fmt(hotT,0)}°C: الخلية بتبدد ${fmt(hot.Pd,1)} W عند ${fmt(hot.V,1)} V. فوق 85°C الـ EVA والـ backsheet في خطر، وفوق 120°C فيه browning وحرق.`:`Hot spot ${fmt(hotT,0)}°C: the cell dissipates ${fmt(hot.Pd,1)} W at ${fmt(hot.V,1)} V. Above 85°C the encapsulant and backsheet are at risk; above 120°C expect browning and burn marks.`);
   if(S.ctx==='iso'&&anyShade&&T.kind==='csi') out.push(ar?'جرّب "جوه المصفوفة": الاسترينج بيفرض تيار أعلى على اللوح المظلل، والـ hot spot بيبان أكتر.':'Switch to "In array": the string forces a higher current through the shaded module and the hot spot gets worse.');
@@ -969,6 +1256,7 @@ function renderArray(){
   $('benchSrc').textContent=t('arrSrc'); $('benchOp').textContent=`${S.strings.length} × ${S.strings[0].length} · ${T.model}`;
   $('insights').innerHTML=arrayInsights(T,mis,po).map(s=>`<li>${s}</li>`).join('');
   renderTilt(fmt(R.op.P/1000,2),'kW');
+  drawMonitor();
 }
 const sizeCache={};
 function hotVmp(T,Tc){ const k=T.id+T.Pmax+'|'+Tc; if(sizeCache[k]) return sizeCache[k]; const e=new Engine(T,{G:1000,Tfix:Tc}); return sizeCache[k]=e.module(e.newModule()).mpp; }
@@ -1161,7 +1449,8 @@ function bindDs(){
   drop.addEventListener('drop',e=>{ const f=e.dataTransfer.files[0]; if(f) readPdf(f); });
   $('dsClose').onclick=()=>$('dsModal').hidden=true; $('dsModal').addEventListener('click',e=>{ if(e.target.id==='dsModal') $('dsModal').hidden=true; });
   $('dsApply').onclick=buildCustom; $('openDs2').onclick=openDs;
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('dsModal').hidden=true; });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ $('dsModal').hidden=true; $('hsModal').hidden=true; } });
+  $('hsClose').onclick=()=>$('hsModal').hidden=true; $('hsModal').addEventListener('click',e=>{ if(e.target.id==='hsModal') $('hsModal').hidden=true; });
 }
 
 // ================= controls / layout =================
@@ -1171,9 +1460,9 @@ function renderStatic(){
   document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));
   $('lgAr').setAttribute('aria-pressed',S.lang==='ar'); $('lgEn').setAttribute('aria-pressed',S.lang==='en');
   const tools=$('tools'); tools.innerHTML='';
-  ['shade','crack','shunt','highrs'].forEach(tl=>{
+  ['shade','crack','shunt','highrs','inspect'].forEach(tl=>{
     const b=document.createElement('button'); b.className='tb'; b.setAttribute('aria-pressed',S.tool===tl);
-    const dc=tl==='shade'?'#0a0c10':'#ffd34d';
+    const dc=tl==='shade'?'#0a0c10':tl==='inspect'?'#5ea0ff':'#ffd34d';
     b.innerHTML=`<i class="dot" style="background:${dc};border:1px solid #556"></i>${t(tl)}`; b.onclick=()=>{ S.tool=tl; renderStatic(); }; tools.appendChild(b); });
   seg('opSeg',[[0.25,'25%'],[0.5,'50%'],[0.75,'75%'],[1,'100%']],()=>S.toolVal,v=>S.toolVal=v); $('opRow').hidden=S.tool!=='shade';
   seg('srcSeg',[['manual','srcMan'],['loc','srcLoc']],()=>S.src,v=>{ S.src=v; if(v!=='loc') stopPlay(); envUpd(); });
@@ -1183,8 +1472,10 @@ function renderStatic(){
   $('lCity').innerHTML=CITIES.map((c,i)=>`<option value="${i}">${c[0]==='Custom'?t('custom'):c[0]}</option>`).join('');
   { const i=CITIES.findIndex(c=>c[1]===S.loc.lat&&c[2]===S.loc.lon); $('lCity').value=i>=0?i:CITIES.length-1; }
   const pr=$('presets'); pr.innerHTML='';
-  Object.keys(PRESETS).forEach(k=>{ const b=document.createElement('button'); b.className='tb'; b.textContent=t(k); b.onclick=()=>{ pushUndo(); selMod().shade=presetShade(CT(),k); schedule(); }; pr.appendChild(b); });
-  seg('viewSeg',[['shade','vShade'],['temp','vTemp'],['volt','vVolt']],()=>S.view,v=>S.view=v);
+  Object.keys(PRESETS).forEach(k=>{ const b=document.createElement('button'); b.className='tb'; b.textContent=t(k); b.onclick=()=>{ pushUndo(); selMod().shade=presetShade(CT(),k); if(k==='pBird'&&S.ctx==='iso'){ S.ctx='arr'; renderStatic(); } schedule(); }; pr.appendChild(b); });
+  { const b=document.createElement('button'); b.className='tb hot'; b.textContent=t('hsBtn'); b.onclick=makeHotSpot; pr.appendChild(b);
+    const q=document.createElement('button'); q.className='tb'; q.textContent='? '+t('hsHow'); q.onclick=openHsInfo; pr.appendChild(q); }
+  seg('viewSeg',[['read','vRead'],['shade','vShade'],['ir','vIR'],['temp','vTemp'],['volt','vVolt']],()=>S.view,v=>S.view=v);
   seg('ctxSeg',[['iso','ctxIso'],['arr','ctxArr']],()=>S.ctx,v=>S.ctx=v);
   seg('trkSeg',[['global','trkG'],['po','trkPO']],()=>S.track,v=>S.track=v);
   seg('daySeg',[['as','dayAs'],['ca','dayCa']],()=>S.day,v=>S.day=v);
@@ -1193,13 +1484,16 @@ function renderStatic(){
   $('tiltCard').hidden=$('tiltCard').hidden||S.src!=='loc';
   const wide=S.tab==='compare'||S.tab==='model'; $('main').classList.toggle('wide',wide); $('rail').hidden=wide; $('right').hidden=wide;
   renderTechs(); if(!$('dsModal').hidden) renderDsForm();
+  $('flowBtn').setAttribute('aria-pressed',!!S.flow); if(S.tab!=='module') $('inspCard').hidden=true; else $('inspCard').hidden=S.insp==null;
 }
 function render(){ if(S.tab==='module') renderModule(); else if(S.tab==='array') renderArray(); else if(S.tab==='compare') renderCompare(); else renderModel(); }
 function bind(){
   $('lgAr').onclick=()=>{ S.lang='ar'; renderStatic(); schedule(); }; $('lgEn').onclick=()=>{ S.lang='en'; renderStatic(); schedule(); };
   document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ S.tab=b.dataset.tab; renderStatic(); requestAnimationFrame(()=>{ if(S.tab==='module') layoutModule(); schedule(); }); });
-  $('scopeRun').onclick=toggleScope; $('scopeClr').onclick=()=>{ HIST.length=0; if(scopePaused) pausedAt=performance.now(); };
-  $('undoBtn').onclick=undo; $('resetAll').onclick=resetAll;
+  $('zoomBtn').onclick=()=>{ S.zoom=!S.zoom; layoutModule(); schedule(); if(S.zoom){ const p=$('plate'); requestAnimationFrame(()=>{ const hc=GEO&&R.mtr?R.mtr.cells.reduce((b,c,i,a)=>c.Th>a[b].Th?i:b,0):0, r=GEO.rects[hc]; if(r){ p.scrollTop=Math.max(0,r.y-p.clientHeight/2); p.scrollLeft=Math.max(0,r.x-p.clientWidth/2); } }); } };
+  $('undoBtn').onclick=undo;
+  $('flowBtn').onclick=()=>{ S.flow=!S.flow; $('flowBtn').setAttribute('aria-pressed',S.flow); };
+  $('saveA').onclick=saveA; $('clrA').onclick=()=>{ S.snapA=null; schedule(); }; $('inspClose').onclick=()=>{ S.insp=null; schedule(); }; $('resetAll').onclick=resetAll;
   $('clearMod').onclick=()=>{ pushUndo(); const m=selMod(); m.shade.fill(0); m.defect.fill(0); m.soil=0; m.gf=1; m.dT=0; m.degr=0; schedule(); };
   const mb=(id,f)=>$(id).addEventListener('input',e=>{ f(selMod(),+e.target.value); schedule(); });
   mb('mSoil',(m,v)=>m.soil=v); mb('mGf',(m,v)=>m.gf=v/100); mb('mDT',(m,v)=>m.dT=v); mb('mDeg',(m,v)=>m.degr=v);
@@ -1218,7 +1512,7 @@ function bind(){
 }
 function resetAll(){
   stopPlay(); S.env=JSON.parse(ENV0); S.inv=JSON.parse(INV0); S.loc=JSON.parse(LOC0);
-  Object.assign(S,{src:'manual',layout:null,tool:'shade',toolVal:1,view:'shade',ctx:'iso',track:'global'});
+  Object.assign(S,{insp:null,snapA:null,flow:true,zoom:false,src:'manual',layout:null,tool:'shade',toolVal:1,view:'read',ctx:'iso',track:'global'});
   const v={eG:1000,eT:25,eR:0,eM:0,lLat:S.loc.lat,lLon:S.loc.lon,lHour:12,lTilt:25,lAz:0,iVmin:500,iVmax:1500,iVdc:1500,iTmin:5,iTmax:45};
   for(const k in v) $(k).value=v[k]; $('eTol').checked=false;
   renderStatic(); setTech(S.tech); envUpd(); scopeReset();
@@ -1226,7 +1520,7 @@ function resetAll(){
 // boot
 eng=new Engine(TECHS.topcon,S.env);
 renderStatic(); bind(); bindDs(); setTech('topcon'); bindEnv(); bindPlate();
-selMod().shade=presetShade(TECHS.topcon,'pBird'); schedule();
+schedule();
 requestAnimationFrame(meterLoop);
 </script>
 
