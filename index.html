@@ -10,7 +10,7 @@
 :root{
   --bg:#071110; --panel:#0D1A19; --panel2:#12231F; --panel3:#18302B; --ink:#E8F0EE; --muted:#8AA39E; --line:#1F3330;
   --accent:#2BB3A3; --volt:#5EA8FF; --amp:#3DDC97; --pwr:#F0B429; --diode:#FF8A3D; --hot:#FF5D4F; --ok:#3fc07a; --warn:#FFB020;
-  --c-topcon:#2BB3A3; --c-topconbf:#4fd1c5; --c-trina720:#5EA8FF; --c-hjt:#b388ff; --c-abc:#f472b6; --c-cdte:#e39a5c; --c-custom:#4fd1c5;
+  --c-topcon:#2BB3A3; --c-suntechq:#4fd1c5; --c-generic:#9aa4b2; --c-trina720:#5EA8FF; --c-hjt:#b388ff; --c-abc:#f472b6; --c-cdte:#e39a5c; --c-custom:#4fd1c5;
   --f-display:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
   --f-body:"IBM Plex Sans Arabic","Readex Pro",system-ui,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
@@ -412,14 +412,14 @@ body.embed{padding:6px}
 // ---------- PV cell-level engine ----------
 const KB = 8.617333e-5;
 const TECHS = {
-  topcon: { id:'topcon', brand:'JinkoSolar', model:'Tiger Neo JKM580N-72HL4-V', tech:'N-type TOPCon',
-    Pmax:580, Vmp:42.37, Imp:13.69, Voc:51.02, Isc:14.47, aIsc:0.045, bVoc:-0.25, gP:-0.29, noct:45, eff:22.45,
-    w:1134, h:2278, kind:'csi', cols:6, rows:24, Np:2, Ns:72, nSub:3, bypass:true, vbr:-16, rshMult:300,
-    bif:0, tol:3, vsys:1500, cellDesc:'144 half-cells (6×24)', nRange:[0.9,2.0] },
-  topconbf: { id:'topconbf', brand:'JinkoSolar', model:'Tiger Neo JKM580N-72HL4-BDV', tech:'TOPCon bifacial',
-    Pmax:580, Vmp:43.88, Imp:13.22, Voc:52.50, Isc:13.95, aIsc:0.045, bVoc:-0.25, gP:-0.29, noct:45, eff:22.45,
-    w:1134, h:2278, kind:'csi', cols:6, rows:24, Np:2, Ns:72, nSub:3, bypass:true, vbr:-16, rshMult:300,
-    bif:0.80, tol:3, vsys:1500, cellDesc:'144 half-cells (6×24), glass-glass bifacial', nRange:[0.9,2.0] },
+  topcon: { id:'topcon', brand:'JinkoSolar', model:'Tiger Neo 3.0 JKM700N-66HL5-BDV', tech:'N-type TOPCon',
+    Pmax:700, Vmp:40.42, Imp:17.32, Voc:48.40, Isc:18.40, aIsc:0.045, bVoc:-0.25, gP:-0.29, noct:45, eff:22.54,
+    w:1303, h:2384, kind:'csi', cols:6, rows:22, Np:2, Ns:66, nSub:3, bypass:true, vbr:-16, rshMult:300,
+    bif:0.80, tol:3, vsys:1500, cellDesc:'132 half-cells (6×22), glass-glass bifacial', nRange:[0.9,2.0] },
+  suntechq: { id:'suntechq', brand:'Suntech', model:'Ultra T 3.0 STP-NT11/66QGDF-650', tech:'TOPCon quarter-cut',
+    Pmax:650, Vmp:41.76, Imp:15.57, Voc:50.00, Isc:16.36, aIsc:0.043, bVoc:-0.22, gP:-0.26, noct:45, eff:24.10,
+    w:1134, h:2382, kind:'csi', cols:6, rows:44, Np:4, Ns:66, nSub:3, bypass:true, vbr:-16, rshMult:300,
+    bif:0.80, tol:3, vsys:1500, cellDesc:'264 quarter-cells (6×44), bifacial', nRange:[0.9,2.0] },
   trina720: { id:'trina720', brand:'Trina Solar', model:'Vertex N TSM-720NEG21C.20', tech:'TOPCon 720 W (G12)',
     Pmax:720, Vmp:41.3, Imp:17.44, Voc:49.4, Isc:18.49, aIsc:0.04, bVoc:-0.24, gP:-0.29, noct:43, eff:23.2,
     w:1303, h:2384, kind:'csi', cols:6, rows:22, Np:2, Ns:66, nSub:3, bypass:true, vbr:-16, rshMult:300,
@@ -432,6 +432,10 @@ const TECHS = {
     Pmax:660, Vmp:45.30, Imp:14.57, Voc:54.60, Isc:15.24, aIsc:0.05, bVoc:-0.22, gP:-0.26, noct:45, eff:24.4,
     w:1134, h:2382, kind:'csi', cols:6, rows:24, Np:2, Ns:72, nSub:3, bypass:true, vbr:-4, rshMult:300,
     bif:0, tol:3, vsys:1500, cellDesc:'144 half-cells (6×24), all contacts on the back', nRange:[0.9,2.0] },
+  generic: { id:'generic', generic:true, brand:'Generic', model:'Educational module (not a real product)', tech:'Generic c-Si (educational)',
+    Pmax:680, Vmp:41.00, Imp:16.59, Voc:49.20, Isc:17.50, aIsc:0.045, bVoc:-0.25, gP:-0.29, noct:45, eff:21.9,
+    w:1303, h:2384, kind:'csi', cols:6, rows:22, Np:2, Ns:66, nSub:3, bypass:true, vbr:-16, rshMult:300,
+    bif:0, tol:3, vsys:1500, cellDesc:'132 half-cells (6×22)', nRange:[0.9,2.0] },
   cdte: { id:'cdte', brand:'First Solar', model:'Series 6 FS-6450A', tech:'Thin film CdTe',
     Pmax:450, Vmp:186.8, Imp:2.41, Voc:221.1, Isc:2.57, aIsc:0.04, bVoc:-0.28, gP:-0.32, noct:45, eff:18.2,
     w:1232, h:2009, kind:'strip', cols:44, rows:24, strips:264, Np:1, Ns:264, nSub:1, bypass:false, vbr:-6, rshMult:150,
@@ -752,11 +756,11 @@ function cmpBroadcast(msg){ if(SPL.loaded){ cmpPost('A',msg); cmpPost('B',msg); 
 Object.values(TECHS).forEach(fitTech);
 const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const $=id=>document.getElementById(id);
-const BASE={topcon:'#17306a',topconbf:'#17306a',trina720:'#16305f',hjt:'#141c3a',abc:'#101a33',cdte:'#241e1a',custom:'#15325e'};
+const BASE={topcon:'#17306a',suntechq:'#17306a',generic:'#1a2438',trina720:'#16305f',hjt:'#141c3a',abc:'#101a33',cdte:'#241e1a',custom:'#15325e'};
 function defLen(T){ const vc=T.Voc*(1+T.bVoc/100*(5-25)); return Math.max(1,Math.min(30,Math.floor(1500/vc)-2)); }
 
 const VAR={};
-function CT(){ const B=TECHS[S.tech]; if(B.kind!=='csi'||!S.layout) return B;
+function CT(){ const B=TECHS[S.tech]; if(B.kind!=='csi'||!B.generic||!S.layout) return B;
   const want={full:1,half:2,quarter:4}[S.layout]||B.Np; if(want===B.Np) return B;
   const k=[B.id,B.Pmax,B.model,S.layout].join('|'); if(VAR[k]) return VAR[k];
   const fr=B.rows/B.Np, nm={1:'full cells',2:'half-cells',4:'quarter-cells'}[want];
@@ -766,7 +770,7 @@ function setTech(id){
   S.tech=id; const T=CT(); eng=new Engine(T,S.env); aux=null; UNDO.length=0; S.insp=null; FLOW=[];
   if(!BASE[id]) BASE[id]=T.kind==='strip'?'#241e1a':'#15325e';
   const n=defLen(T); S.strings=[0,1].map(()=>Array.from({length:n},()=>eng.newModule()));
-  S.sel={s:0,m:0}; scopeReset(); renderTechs(); layoutModule(); schedule();
+  S.sel={s:0,m:0}; scopeReset(); renderTechs(); renderLay(); layoutModule(); schedule();
 }
 function selMod(){ return S.strings[S.sel.s][S.sel.m]; }
 function selIdx(){ let i=0; for(let s=0;s<S.sel.s;s++) i+=S.strings[s].length; return i+S.sel.m; }
@@ -840,14 +844,14 @@ const vcol=v=>{ if(v<0){ const f=Math.min(1,-v/12); return `rgb(${Math.round(120
 const TLO=15, THI=150;
 
 // ================= header techs =================
-function techFamily(T){ const x=(T.tech||'').toLowerCase(); if(x.includes('topcon')) return 'N-type TOPCon'; if(x.includes('hetero')||x.includes('hjt')) return 'Heterojunction (HJT)'; if(x.includes('back contact')||x.includes('abc')||x.includes('bc')) return 'Back contact (ABC / BC)'; if(x.includes('thin')||x.includes('cdte')) return 'Thin film'; return 'Custom / uploaded'; }
+function techFamily(T){ if(T.generic) return 'Educational (generic)'; const x=(T.tech||'').toLowerCase(); if(x.includes('topcon')) return 'N-type TOPCon'; if(x.includes('hetero')||x.includes('hjt')) return 'Heterojunction (HJT)'; if(x.includes('back contact')||x.includes('abc')||x.includes('bc')) return 'Back contact (ABC / BC)'; if(x.includes('thin')||x.includes('cdte')) return 'Thin film'; return 'Custom / uploaded'; }
 function renderTechs(){
   const box=$('techs'), ar=S.lang==='ar', fam={};
   Object.values(TECHS).forEach(T=>{ const f=techFamily(T); (fam[f]=fam[f]||[]).push(T); });
   const T0=TECHS[S.tech], CTt=CT();
   const opts=Object.entries(fam).map(([f,list])=>`<optgroup label="${f}">${list.map(T=>`<option value="${T.id}" ${T.id===S.tech?'selected':''}>${T.brand} ${T.Pmax} W · ${T.tech}${T.bif?' · bifacial '+Math.round(T.bif*100)+'%':''}</option>`).join('')}</optgroup>`).join('');
-  box.innerHTML=`<div class="msel" style="--tc:var(--c-${TECHS[S.tech]&&['topcon','topconbf','trina720','hjt','abc','cdte'].includes(S.tech)?S.tech:'custom'})"><span class="ml">${ar?'اللوح':'Module'}</span><select id="techSel" aria-label="module">${opts}</select>
-    <span class="minfo mono">${T0.model} · Voc ${fmt(T0.Voc,1)} V · Isc ${fmt(T0.Isc,2)} A · ${CTt.cellDesc}</span></div><button class="btn dsAdd" id="dsAdd">${t('addDs')}</button>`;
+  box.innerHTML=`<div class="msel" style="--tc:var(--c-${TECHS[S.tech]&&['topcon','suntechq','trina720','hjt','abc','cdte','generic'].includes(S.tech)?S.tech:'custom'})"><span class="ml">${ar?'اللوح':'Module'}</span><select id="techSel" aria-label="module">${opts}</select>
+    <span class="minfo mono">${T0.model} · Voc ${fmt(T0.Voc,1)} V · Isc ${fmt(T0.Isc,2)} A · ${CTt.cellDesc}${CTt.bypass?' · '+CTt.nSub+' diodes':''}${T0.generic?(ar?' · لوح افتراضي للتعليم، غيّر التقطيع من الأزرار':' · virtual module for learning, change cell cut with the buttons'):''}</span></div><button class="btn dsAdd" id="dsAdd">${t('addDs')}</button>`;
   $('techSel').onchange=e=>{ S.layout=null; setTech(e.target.value); };
   $('dsAdd').onclick=openDs;
 }
@@ -1888,6 +1892,7 @@ function bindDs(){
 }
 
 // ================= controls / layout =================
+function renderLay(){ const CTt=CT(); seg('laySeg',[['full','layFull'],['half','layHalf'],['quarter','layQuarter']],()=>CTt.Np===4?'quarter':CTt.Np===2?'half':'full',v=>{ S.layout=v; setTech(S.tech); }); $('laySeg').hidden=CTt.kind!=='csi'||!TECHS[S.tech].generic; }
 function seg(id,opts,get,set){ const el=$(id); el.innerHTML=''; opts.forEach(([v,k])=>{ const b=document.createElement('button'); b.textContent=t(k); b.setAttribute('aria-pressed',get()===v); b.onclick=()=>{ set(v); renderStatic(); schedule(); }; el.appendChild(b); }); }
 function renderStatic(){
   document.documentElement.lang=S.lang; document.documentElement.dir=S.lang==='ar'?'rtl':'ltr';
@@ -1901,7 +1906,7 @@ function renderStatic(){
   seg('opSeg',[[0.25,'25%'],[0.5,'50%'],[0.75,'75%'],[1,'100%']],()=>S.toolVal,v=>S.toolVal=v); $('opRow').hidden=S.tool!=='shade';
   seg('srcSeg',[['manual','srcMan'],['loc','srcLoc']],()=>S.src,v=>{ S.src=v; if(v!=='loc') stopPlay(); envUpd(); });
   $('manualBox').hidden=S.src!=='manual'; $('locBox').hidden=S.src!=='loc';
-  const CTt=CT(); seg('laySeg',[['full','layFull'],['half','layHalf'],['quarter','layQuarter']],()=>CTt.Np===4?'quarter':CTt.Np===2?'half':'full',v=>{ S.layout=v; setTech(S.tech); }); $('laySeg').hidden=CTt.kind!=='csi';
+  renderLay();
   $('lMonth').innerHTML=t('months').map((m,i)=>`<option value="${i}" ${i===S.loc.month?'selected':''}>${m}</option>`).join('');
   $('lCity').innerHTML=CITIES.map((c,i)=>`<option value="${i}">${c[0]==='Custom'?t('custom'):c[0]}</option>`).join('');
   { const i=CITIES.findIndex(c=>c[1]===S.loc.lat&&c[2]===S.loc.lon); $('lCity').value=i>=0?i:CITIES.length-1; }
