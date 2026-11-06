@@ -10,7 +10,7 @@
 :root{
   --bg:#071110; --panel:#0D1A19; --panel2:#12231F; --panel3:#18302B; --ink:#E8F0EE; --muted:#8AA39E; --line:#1F3330;
   --accent:#2BB3A3; --volt:#5EA8FF; --amp:#3DDC97; --pwr:#F0B429; --diode:#FF8A3D; --hot:#FF5D4F; --ok:#3fc07a; --warn:#FFB020;
-  --c-topcon:#2BB3A3; --c-hjt:#b388ff; --c-cdte:#e39a5c; --c-custom:#4fd1c5;
+  --c-topcon:#2BB3A3; --c-topconbf:#4fd1c5; --c-trina720:#5EA8FF; --c-hjt:#b388ff; --c-abc:#f472b6; --c-cdte:#e39a5c; --c-custom:#4fd1c5;
   --f-display:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
   --f-body:"IBM Plex Sans Arabic","Readex Pro",system-ui,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
@@ -38,7 +38,12 @@ button{font:inherit;color:inherit}
 .tabs{display:flex;gap:2px}
 .tabs button{border:0;background:none;padding:6px 10px;cursor:pointer;color:var(--muted);border-radius:7px;font-family:var(--f-display);font-weight:500;white-space:nowrap}
 .tabs button[aria-selected="true"]{color:var(--ink);background:var(--panel3)}
-.chipsTech{display:flex;gap:6px;flex-wrap:wrap;margin-inline-start:auto}
+.chipsTech{display:flex;gap:6px;flex-wrap:wrap;margin-inline-start:auto;align-items:center}
+.msel{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-inline-start:4px solid var(--tc);border-radius:8px;padding:4px 10px;min-width:0}
+.msel .ml{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.msel select{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font:inherit;font-size:12.5px;font-weight:600;max-width:380px}
+.msel .minfo{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
+@media (max-width:1400px){.msel .minfo{display:none}}
 .tchip{border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:4px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;min-width:0}
 .tchip b{font-size:10px;letter-spacing:.07em;color:var(--tc);text-transform:uppercase}
 .tchip span{font-size:11.5px;font-family:var(--f-mono);color:var(--muted);white-space:nowrap}
@@ -121,6 +126,8 @@ input[type=range]{width:100%;accent-color:var(--accent);direction:ltr;margin:2px
 .insights{margin:0;padding-inline-start:16px;display:flex;flex-direction:column;gap:4px;font-size:12.5px}
 .strings{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto;padding-inline-end:2px}
 .strings.many .str{padding:3px 6px;gap:2px} .strings.many .tile{height:12px}
+.lenIn{width:46px;text-align:center;font-family:var(--f-mono);font-size:12px;padding:1px 2px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink);-moz-appearance:textfield}
+.lenIn::-webkit-inner-spin-button,.lenIn::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .nstr{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted)} .nstr input{width:56px;font-family:var(--f-mono);font-size:12px;padding:2px 5px;border:1px solid var(--line);border-radius:5px;background:var(--panel2);color:var(--ink)}
 .str{border:1px solid var(--line);border-radius:8px;padding:5px 8px;display:flex;flex-direction:column;gap:4px}
 .tiles{display:flex;flex-wrap:wrap;gap:3px;direction:ltr}
@@ -177,6 +184,16 @@ input[type=number],input[type=text],select{width:100%;font:inherit;font-family:v
 @media (max-width:760px){.tiltgrid{grid-template-columns:minmax(0,1fr)}}
 .lgd{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px}
 .lgd span::before{content:"";display:inline-block;width:12px;height:3px;border-radius:2px;margin-inline-end:5px;vertical-align:middle;background:var(--c)}
+.cmpwrap{display:flex;flex-direction:column;gap:6px;height:100%;min-height:0}
+.cmpbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chk2{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+.split2{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;min-height:0}
+.pane{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg);min-height:78vh}
+.pane iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.pbadge{position:absolute;top:6px;inset-inline-end:10px;z-index:2;background:var(--accent);color:#06100F;font-weight:700;font-size:12px;border-radius:999px;padding:1px 9px}
+@media (max-width:1000px){.split2{grid-template-columns:minmax(0,1fr)} .pane{min-height:90vh}}
+body.embed .tabs [data-tab=compare],body.embed .tabs [data-tab=model],body.embed #themeBtn,body.embed .lang,body.embed .credit{display:none!important}
+body.embed{padding:6px}
 .cmpgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .cmpgrid .chartbox canvas{height:250px}
 /* dialog */
@@ -300,7 +317,14 @@ input[type=number],input[type=text],select{width:100%;font:inherit;font-family:v
         </div>
       </div>
       <!-- compare -->
-      <div data-show="compare" class="cmpgrid">
+      <div data-show="compare" class="cmpwrap">
+        <div class="cmpbar"><b data-i="cmpSplitT"></b><span class="note" data-i="cmpSplitN"></span><span style="flex:1"></span>
+          <button class="btn" id="cpAB">A → B</button><button class="btn" id="cpBA">B → A</button>
+          <label class="chk2"><input type="checkbox" id="syncEnv" checked> <span data-i="cmpSync"></span></label>
+          <button class="btn" id="cmpReset" data-i="cmpReset"></button></div>
+        <div class="split2"><div class="pane"><span class="pbadge">A</span><iframe id="fA" title="A"></iframe></div><div class="pane"><span class="pbadge">B</span><iframe id="fB" title="B"></iframe></div></div>
+      </div>
+      <div data-show="model" class="cmpgrid">
         <div class="card"><h2 data-i="cmpTemp"></h2><p class="note" data-i="cmpTempNote"></p><div class="lgd" id="lgd1"></div><div class="chartbox"><canvas id="cmpT"></canvas></div></div>
         <div class="card"><div class="row between"><h2 data-i="cmpDay"></h2><div class="seg" id="daySeg"></div></div><p class="note" data-i="cmpDayNote"></p><div class="lgd" id="lgd2"></div>
           <div class="chartbox"><canvas id="cmpD"></canvas></div><div class="tw"><table id="dayTable"></table></div></div>
@@ -392,10 +416,22 @@ const TECHS = {
     Pmax:580, Vmp:42.37, Imp:13.69, Voc:51.02, Isc:14.47, aIsc:0.045, bVoc:-0.25, gP:-0.29, noct:45, eff:22.45,
     w:1134, h:2278, kind:'csi', cols:6, rows:24, Np:2, Ns:72, nSub:3, bypass:true, vbr:-16, rshMult:300,
     bif:0, tol:3, vsys:1500, cellDesc:'144 half-cells (6×24)', nRange:[0.9,2.0] },
+  topconbf: { id:'topconbf', brand:'JinkoSolar', model:'Tiger Neo JKM580N-72HL4-BDV', tech:'TOPCon bifacial',
+    Pmax:580, Vmp:43.88, Imp:13.22, Voc:52.50, Isc:13.95, aIsc:0.045, bVoc:-0.25, gP:-0.29, noct:45, eff:22.45,
+    w:1134, h:2278, kind:'csi', cols:6, rows:24, Np:2, Ns:72, nSub:3, bypass:true, vbr:-16, rshMult:300,
+    bif:0.80, tol:3, vsys:1500, cellDesc:'144 half-cells (6×24), glass-glass bifacial', nRange:[0.9,2.0] },
+  trina720: { id:'trina720', brand:'Trina Solar', model:'Vertex N TSM-720NEG21C.20', tech:'TOPCon 720 W (G12)',
+    Pmax:720, Vmp:41.3, Imp:17.44, Voc:49.4, Isc:18.49, aIsc:0.04, bVoc:-0.24, gP:-0.29, noct:43, eff:23.2,
+    w:1303, h:2384, kind:'csi', cols:6, rows:22, Np:2, Ns:66, nSub:3, bypass:true, vbr:-16, rshMult:300,
+    bif:0.80, tol:3, vsys:1500, cellDesc:'132 half-cells (6×22), bifacial', nRange:[0.9,2.0] },
   hjt: { id:'hjt', brand:'Huasun', model:'Himalaya G12 HS-210-B132DS700', tech:'Heterojunction (HJT)',
     Pmax:700, Vmp:42.10, Imp:16.63, Voc:50.13, Isc:17.43, aIsc:0.04, bVoc:-0.24, gP:-0.26, noct:44, eff:22.53,
     w:1303, h:2384, kind:'csi', cols:6, rows:22, Np:2, Ns:66, nSub:3, bypass:true, vbr:-12, rshMult:400,
     bif:0.90, tol:3, vsys:1500, cellDesc:'132 half-cells (6×22)', nRange:[0.9,2.0] },
+  abc: { id:'abc', brand:'AIKO', model:'Comet 2U AIKO-G660-MCH72Mw', tech:'Back contact (ABC)',
+    Pmax:660, Vmp:45.30, Imp:14.57, Voc:54.60, Isc:15.24, aIsc:0.05, bVoc:-0.22, gP:-0.26, noct:45, eff:24.4,
+    w:1134, h:2382, kind:'csi', cols:6, rows:24, Np:2, Ns:72, nSub:3, bypass:true, vbr:-4, rshMult:300,
+    bif:0, tol:3, vsys:1500, cellDesc:'144 half-cells (6×24), all contacts on the back', nRange:[0.9,2.0] },
   cdte: { id:'cdte', brand:'First Solar', model:'Series 6 FS-6450A', tech:'Thin film CdTe',
     Pmax:450, Vmp:186.8, Imp:2.41, Voc:221.1, Isc:2.57, aIsc:0.04, bVoc:-0.28, gP:-0.32, noct:45, eff:18.2,
     w:1232, h:2009, kind:'strip', cols:44, rows:24, strips:264, Np:1, Ns:264, nSub:1, bypass:false, vbr:-6, rshMult:150,
@@ -570,7 +606,7 @@ if(typeof module!=='undefined') module.exports={TECHS,fitTech,Engine,localMax,in
 const L={
 ar:{title:"سراج · معمل الظل والميسماتش",by:"إعداد",
 srcMan:"يدوي",srcLoc:"الموقع والميل",city:"الموقع",lat:"خط العرض °",lon:"خط الطول °",month:"الشهر",hour:"التوقيت الشمسي",tilt:"زاوية الميل °",azim:"الاتجاه ° (0=جنوب)",
-tiltTitle:"الميل والإنتاج (سماء صافية)",layHalf:"Half-cut",layFull:"Full cell",undo:"تراجع",reset:"ريسيت",toInv:"معمل الإنفرتر ←",
+tiltTitle:"الميل والإنتاج (سماء صافية)",layHalf:"Half-cut",layFull:"Full cell",layQuarter:"Quarter-cut",undo:"تراجع",reset:"ريسيت",toInv:"معمل الإنفرتر ←",
 toolHelp:"اضغط أو اسحب على الخلايا. اضغط على خلية متعلّمة تاني عشان تشيلها.",opacity:"كثافة الظل",
 poaNow:"الإشعاع على اللوح",pNow:"القدرة الآن",dayE:"إنتاج اليوم",yearE:"إنتاج السنة",optTilt:"أفضل ميل سنوي",optMonth:"أفضل ميل للشهر",ofBest:"من الأفضل",annual:"سنوي",thisMonth:"الشهر",custom:"مخصص",
 tiltNote:"لوح نضيف، سماء صافية، وحرارة الجو ثابتة طول اليوم. في الموقع الحقيقي مع التراب والغبار الإنتاج بيقل حوالي 10–20%.",
@@ -582,7 +618,7 @@ arrTitle:"الاسترينجات",nStr:"عدد الاسترينجات",addStr:"+
 lgByp:"bypass شغال",lgHot:"hot spot",lgRev:"تيار عكسي",
 invTitle:"الإنفرتر والتحجيم",mpptMin:"MPPT أدنى V",mpptMax:"MPPT أقصى V",vdcMax:"أقصى DC V",tmin:"أقل حرارة °C",tmax:"أعلى حرارة جو °C",tracking:"التتبع",
 arrCurve:"منحنى المصفوفة",
-cmpTemp:"القدرة مقابل حرارة الخلية",cmpTempNote:"P/P_STC عند 1000 W/m²، والميل هو γ من الداتا شيت.",
+cmpSplitT:"المقارنة",cmpSplitN:"نسختين كاملتين جنب بعض: غيّر اللوح أو الظل أو الاسترينجات في كل ناحية وقارن.",cmpSync:"نفس الظروف (إشعاع وحرارة)",cmpReset:"ابدأ من الشاشة الرئيسية",cmpTemp:"القدرة مقابل حرارة الخلية",cmpTempNote:"P/P_STC عند 1000 W/m²، والميل هو γ من الداتا شيت.",
 cmpDay:"يوم كامل بدون ظل",cmpDayNote:"سماء صافية، حرارة اللوح من NOCT، الطاقة لكل kWp.",
 cmpShade:"نفس الظل على كل التكنولوجيات",cmpShadeNote:"نفس المساحة الفيزيائية للظل عند STC. الخسارة للوح لوحده عند الـ MPP بتاعه، وأسخن خلية عند تيار الاسترينج (Imp للوح سليم).",
 dsTitle:"الداتا شيت",mdlTitle:"معاملات النموذج",addDs:"+ ارفع داتا شيت",
@@ -609,7 +645,7 @@ chkOk:"Vmp×Imp = {p} W ({d}% من Pmax)",chkBad:"راجع القيم: ",fitFail
 },
 en:{title:"Siraj · PV Mismatch Lab",by:"by",
 srcMan:"Manual",srcLoc:"Location & tilt",city:"Location",lat:"Latitude °",lon:"Longitude °",month:"Month",hour:"Solar time",tilt:"Tilt °",azim:"Azimuth ° (0=south)",
-tiltTitle:"Tilt & yield (clear sky)",layHalf:"Half-cut",layFull:"Full cell",undo:"Undo",reset:"Reset",toInv:"Inverter Lab →",
+tiltTitle:"Tilt & yield (clear sky)",layHalf:"Half-cut",layFull:"Full cell",layQuarter:"Quarter-cut",undo:"Undo",reset:"Reset",toInv:"Inverter Lab →",
 toolHelp:"Click or drag on cells. Click a marked cell again to remove it.",opacity:"Shade density",
 poaNow:"Irradiance on module",pNow:"Power now",dayE:"This day",yearE:"Per year",optTilt:"Best tilt (year)",optMonth:"Best tilt (month)",ofBest:"of best",annual:"Year",thisMonth:"Month",custom:"Custom",
 tiltNote:"Clean module, clear sky, constant ambient all day. Real sites with dust and haze yield roughly 10–20% less.",
@@ -621,7 +657,7 @@ arrTitle:"Strings",nStr:"Strings in parallel",addStr:"+ string",arrHelp:"Tap a m
 lgByp:"bypass on",lgHot:"hot spot",lgRev:"reverse current",
 invTitle:"Inverter & sizing",mpptMin:"MPPT min V",mpptMax:"MPPT max V",vdcMax:"Max DC V",tmin:"Site min °C",tmax:"Max ambient °C",tracking:"Tracking",
 arrCurve:"Array curve",
-cmpTemp:"Power vs cell temperature",cmpTempNote:"P/P_STC at 1000 W/m²; the slope is the datasheet γ.",
+cmpSplitT:"Compare",cmpSplitN:"Two full copies side by side: change the module, shading or strings on each side and compare.",cmpSync:"Same conditions (irradiance & temperature)",cmpReset:"Start from main view",cmpTemp:"Power vs cell temperature",cmpTempNote:"P/P_STC at 1000 W/m²; the slope is the datasheet γ.",
 cmpDay:"Full day, no shading",cmpDayNote:"Clear sky, NOCT module temperature, energy per kWp.",
 cmpShade:"The same shadow on every technology",cmpShadeNote:"Same physical shadow at STC. Loss is the module alone at its own MPP; hottest cell at string current (healthy Imp).",
 dsTitle:"Datasheet",mdlTitle:"Model parameters",addDs:"+ Upload datasheet",
@@ -681,18 +717,50 @@ function applyTheme(){ document.querySelector('style').textContent=remapStr(CSS0
 applyTheme();
 
 let eng=null, R={}, aux=null;
+// ================= split compare (two live copies) =================
+const EMBED=(()=>{ try{ return new URLSearchParams(location.search).get('embed'); }catch(e){ return null; } })();
+function getState(){ return {tech:S.tech,layout:S.layout,ctx:S.ctx,env:{G:S.env.G,Tamb:S.env.Tamb,Grear:S.env.Grear,cellMis:S.env.cellMis,tolMis:S.env.tolMis},
+  strings:S.strings.map(st=>st.map(m=>({shade:Array.from(m.shade),defect:Array.from(m.defect),soil:m.soil,gf:m.gf,dT:m.dT,degr:m.degr}))),sel:{...S.sel},track:S.track,src:'manual'}; }
+let SILENT=false;
+function setEnvSilent(env){ SILENT=true; ['G','Tamb','Grear','cellMis'].forEach(k=>{ if(env[k]!=null) S.env[k]=env[k]; }); S.env.tolMis=!!env.tolMis;
+  $('eG').value=S.env.G; $('eT').value=S.env.Tamb; $('eR').value=S.env.Grear; $('eM').value=S.env.cellMis; $('eTol').checked=S.env.tolMis;
+  $('vG').textContent=S.env.G; $('vT').textContent=S.env.Tamb; $('vR').textContent=S.env.Grear; $('vM').textContent=S.env.cellMis; eng.setEnv(S.env); SILENT=false; }
+function setState(st){ if(!st||!TECHS[st.tech]) return; S.src='manual'; S.layout=st.layout||null; setEnvSilent(st.env||{}); setTech(st.tech);
+  S.strings=st.strings.map(row=>row.map(o=>{ const m=eng.newModule(); if(o.shade&&o.shade.length===m.shade.length){ m.shade.set(o.shade); m.defect.set(o.defect); } m.soil=o.soil||0; m.gf=o.gf==null?1:o.gf; m.dT=o.dT||0; m.degr=o.degr||0; return m; }));
+  S.sel={s:Math.min(st.sel.s,S.strings.length-1),m:0}; S.sel.m=Math.min(st.sel.m,S.strings[S.sel.s].length-1); S.ctx=st.ctx||'iso'; S.track=st.track||'global'; renderStatic(); schedule(); }
+if(EMBED){
+  document.body.classList.add('embed');
+  try{ const lg=new URLSearchParams(location.search).get('lang'); if(lg==='ar'||lg==='en') S.lang=lg; }catch(e){}
+  window.addEventListener('message',e=>{ if(e.source!==window.parent) return; const d=e.data||{};
+    if(d.type==='pvlab:get') window.parent.postMessage({type:'pvlab:state',side:EMBED,state:getState()},'*');
+    else if(d.type==='pvlab:set') setState(d.state);
+    else if(d.type==='pvlab:env'){ setEnvSilent(d.env); schedule(); }
+    else if(d.type==='pvlab:theme'){ THEME=d.theme; applyTheme(); renderStatic(); schedule(); }
+    else if(d.type==='pvlab:lang'){ S.lang=d.lang; renderStatic(); schedule(); } });
+}
+const SPL={loaded:false,ready:{A:false,B:false},pend:null};
+function cmpFrames(){ return {A:$('fA'),B:$('fB')}; }
+function cmpPost(side,msg){ const f=cmpFrames()[side]; if(f&&f.contentWindow) f.contentWindow.postMessage(msg,'*'); }
+function cmpInit(){ if(SPL.loaded||EMBED) return; SPL.loaded=true; const base=location.href.split('#')[0].split('?')[0], st=getState();
+  ['A','B'].forEach(k=>{ const f=cmpFrames()[k]; f.onload=()=>{ SPL.ready[k]=true; cmpPost(k,{type:'pvlab:set',state:st}); }; f.src=base+'?embed='+k+'&lang='+S.lang; }); }
+if(!EMBED) window.addEventListener('message',e=>{ const d=e.data||{}, F=cmpFrames(); const side=(F.A&&e.source===F.A.contentWindow)?'A':(F.B&&e.source===F.B.contentWindow)?'B':null; if(!side) return;
+  if(d.type==='pvlab:state'&&SPL.pend&&SPL.pend[0]===side){ cmpPost(SPL.pend[1],{type:'pvlab:set',state:d.state}); SPL.pend=null; }
+  else if(d.type==='pvlab:envchg'&&$('syncEnv').checked) cmpPost(side==='A'?'B':'A',{type:'pvlab:env',env:d.env}); });
+function cmpCopy(from,to){ SPL.pend=[from,to]; cmpPost(from,{type:'pvlab:get'}); }
+function cmpBroadcast(msg){ if(SPL.loaded){ cmpPost('A',msg); cmpPost('B',msg); } }
+
 Object.values(TECHS).forEach(fitTech);
 const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const $=id=>document.getElementById(id);
-const BASE={topcon:'#17306a',hjt:'#141c3a',cdte:'#241e1a',custom:'#15325e'};
+const BASE={topcon:'#17306a',topconbf:'#17306a',trina720:'#16305f',hjt:'#141c3a',abc:'#101a33',cdte:'#241e1a',custom:'#15325e'};
 function defLen(T){ const vc=T.Voc*(1+T.bVoc/100*(5-25)); return Math.max(1,Math.min(30,Math.floor(1500/vc)-2)); }
 
 const VAR={};
 function CT(){ const B=TECHS[S.tech]; if(B.kind!=='csi'||!S.layout) return B;
-  const isHalf=B.Np===2; if((S.layout==='half')===isHalf) return B;
+  const want={full:1,half:2,quarter:4}[S.layout]||B.Np; if(want===B.Np) return B;
   const k=[B.id,B.Pmax,B.model,S.layout].join('|'); if(VAR[k]) return VAR[k];
-  const V=S.layout==='full'?{...B,rows:B.rows/2,Np:1,cellDesc:`${B.Ns} full cells (6×${B.rows/2})`,fit:null}
-                           :{...B,rows:B.rows*2,Np:2,cellDesc:`${B.Ns*2} half-cells (6×${B.rows*2})`,fit:null};
+  const fr=B.rows/B.Np, nm={1:'full cells',2:'half-cells',4:'quarter-cells'}[want];
+  const V={...B,rows:fr*want,Np:want,cellDesc:`${B.Ns*want} ${nm} (${B.cols}×${fr*want})`,fit:null};
   fitTech(V); return VAR[k]=V; }
 function setTech(id){
   S.tech=id; const T=CT(); eng=new Engine(T,S.env); aux=null; UNDO.length=0; S.insp=null; FLOW=[];
@@ -772,17 +840,21 @@ const vcol=v=>{ if(v<0){ const f=Math.min(1,-v/12); return `rgb(${Math.round(120
 const TLO=15, THI=150;
 
 // ================= header techs =================
+function techFamily(T){ const x=(T.tech||'').toLowerCase(); if(x.includes('topcon')) return 'N-type TOPCon'; if(x.includes('hetero')||x.includes('hjt')) return 'Heterojunction (HJT)'; if(x.includes('back contact')||x.includes('abc')||x.includes('bc')) return 'Back contact (ABC / BC)'; if(x.includes('thin')||x.includes('cdte')) return 'Thin film'; return 'Custom / uploaded'; }
 function renderTechs(){
-  const box=$('techs'); box.innerHTML='';
-  Object.values(TECHS).forEach(T=>{
-    const b=document.createElement('button'); b.className='tchip'; b.setAttribute('aria-pressed',S.tech===T.id); b.style.setProperty('--tc',`var(--c-${T.id==='custom'?'custom':T.id})`);
-    b.innerHTML=`<b>${T.tech}</b><span>${T.brand} ${T.Pmax}W</span>`; b.title=T.brand+' '+T.model; b.onclick=()=>{ S.layout=null; setTech(T.id); }; box.appendChild(b); });
-  const a=document.createElement('button'); a.className='tchip add'; a.style.setProperty('--tc','var(--c-custom)'); a.innerHTML=`<b>${t('addDs')}</b><span>PDF</span>`; a.onclick=openDs; box.appendChild(a);
+  const box=$('techs'), ar=S.lang==='ar', fam={};
+  Object.values(TECHS).forEach(T=>{ const f=techFamily(T); (fam[f]=fam[f]||[]).push(T); });
+  const T0=TECHS[S.tech], CTt=CT();
+  const opts=Object.entries(fam).map(([f,list])=>`<optgroup label="${f}">${list.map(T=>`<option value="${T.id}" ${T.id===S.tech?'selected':''}>${T.brand} ${T.Pmax} W · ${T.tech}${T.bif?' · bifacial '+Math.round(T.bif*100)+'%':''}</option>`).join('')}</optgroup>`).join('');
+  box.innerHTML=`<div class="msel" style="--tc:var(--c-${TECHS[S.tech]&&['topcon','topconbf','trina720','hjt','abc','cdte'].includes(S.tech)?S.tech:'custom'})"><span class="ml">${ar?'اللوح':'Module'}</span><select id="techSel" aria-label="module">${opts}</select>
+    <span class="minfo mono">${T0.model} · Voc ${fmt(T0.Voc,1)} V · Isc ${fmt(T0.Isc,2)} A · ${CTt.cellDesc}</span></div><button class="btn dsAdd" id="dsAdd">${t('addDs')}</button>`;
+  $('techSel').onchange=e=>{ S.layout=null; setTech(e.target.value); };
+  $('dsAdd').onclick=openDs;
 }
 function bindEnv(){
   envUpd=()=>{ readLoc(); if(S.src==='loc') applySun(); else S.env.G=+$('eG').value; S.env.Tamb=+$('eT').value; S.env.Grear=+$('eR').value; S.env.cellMis=+$('eM').value; S.env.tolMis=$('eTol').checked;
     $('vG').textContent=S.env.G; $('vT').textContent=S.env.Tamb; showLoc(); $('vR').textContent=S.env.Grear; $('vM').textContent=S.env.cellMis;
-    eng.setEnv(S.env); schedule(); };
+    eng.setEnv(S.env); schedule(); if(EMBED&&!SILENT) window.parent.postMessage({type:'pvlab:envchg',side:EMBED,env:{G:S.env.G,Tamb:S.env.Tamb,Grear:S.env.Grear,cellMis:S.env.cellMis,tolMis:S.env.tolMis}},'*'); };
   ['eG','eT','eR','eM','eTol','lLat','lLon','lMonth','lHour','lTilt','lAz'].forEach(id=>$(id).addEventListener('input',envUpd));
   $('lCity').addEventListener('change',()=>{ const c=CITIES[+$('lCity').value]; if(c[1]!=null){ $('lLat').value=c[1]; $('lLon').value=c[2]; } envUpd(); });
   ['lLat','lLon'].forEach(id=>$(id).addEventListener('input',()=>{ const i=CITIES.findIndex(c=>c[1]===+$('lLat').value&&c[2]===+$('lLon').value); $('lCity').value=i>=0?i:CITIES.length-1; }));
@@ -842,7 +914,7 @@ function layoutModule(){
   plate.classList.toggle('zoom',!!S.zoom); $('zoomBtn').setAttribute('aria-pressed',!!S.zoom);
   let H=ph, W=H*T.w/T.h; if(W>pw){ W=pw; H=W*T.h/T.w; } if(S.zoom){ const z=Math.max(2,Math.min(3.2,pw*0.98/W)); W*=z; H*=z; }
   W=Math.round(W); H=Math.round(H); cv.style.width=W+'px'; cv.style.height=H+'px'; const fc=$('flowCv'); fc.style.width=W+'px'; fc.style.height=H+'px';
-  const fr=Math.max(5,W*0.025), gap=T.kind==='csi'?Math.max(1,W*0.006):0, mid=(T.kind==='csi'&&T.Np===2)?H*0.022:0;
+  const fr=Math.max(5,W*0.025), gap=T.kind==='csi'?Math.max(1,W*0.006):0, mid=(T.kind==='csi'&&T.Np>=2)?H*0.022:0;
   const iw=W-2*fr, ih=H-2*fr-mid, cw=(iw-gap*(T.cols-1))/T.cols, ch=(ih-gap*(T.rows-1))/T.rows;
   const rects=[];
   for(let r=0;r<T.rows;r++) for(let c=0;c<T.cols;c++){ const y=fr+r*(ch+gap)+(mid&&r>=T.rows/2?mid:0); rects.push({x:fr+c*(cw+gap),y,w:cw,h:ch}); }
@@ -960,7 +1032,7 @@ function openHsInfo(){
   const T=CT(), ar=S.lang==='ar', A=v=>fmt(v,2)+' A';
   const cells=R.mtr?R.mtr.cells:[]; let hi=0; cells.forEach((c,i)=>{ if(c.Pd>cells[hi].Pd) hi=i; });
   const h=cells[hi]||{V:0,I:0,Pd:0,Th:0}, Iop=R.Icur||0, live=h.Pd>1;
-  const Iref=R.mref?R.mref.mpp.I:T.Imp, perCell=T.Np===2?Iref/2:Iref;
+  const Iref=R.mref?R.mref.mpp.I:T.Imp, perCell=Iref/T.Np;
   const cps=T.kind==='csi'?T.cols/T.nSub:1, cellsPerSub=T.kind==='csi'?T.rows/T.Np*cps:T.Ns;
   const vOthers=(cellsPerSub-1)*0.55;
   const wf=HS?Math.round(HS.f*100):null;
@@ -1132,18 +1204,18 @@ function cellCircuit(T,id){ const ar=S.lang==='ar', b=cellBreak(T,id), W=600,H=2
   return {svg:s,lines:L,tag}; }
 function halfState(T,ids,Ih,Vs){ const cells=R.mtr.cells; const w=ids.reduce((a,id)=>cells[id].V<cells[a].V?id:a,ids[0]); const Iref=R.mref.mpp.I/T.Np;
   if(cells[w].V<-0.2&&Math.abs(Ih)>0.15) return {st:'rev',w}; if(Math.abs(Ih)<0.12*Iref) return {st:'open',w}; if(Vs<0.6&&Ih>0.15) return {st:'short',w}; return {st:'gen',w}; }
-function moduleCircuit(T){ const ar=S.lang==='ar', tr=R.mtr, mr=R.mr, I=R.Icur, Cg=eng.Cg, nS=T.nSub, BW=230, W=BW*nS+80, H=T.Np===2?190:160, Imax=Math.max(R.mref.mpp.I,0.5);
+function moduleCircuit(T){ const ar=S.lang==='ar', tr=R.mtr, mr=R.mr, I=R.Icur, Cg=eng.Cg, nS=T.nSub, BW=230, W=BW*nS+80, H=T.Np===1?160:(T.Np===2?190:250), Imax=Math.max(R.mref.mpp.I,0.5);
   const lab={gen:ar?'بينتج':'producing',rev:ar?'فيه خلية بالعكس':'cell in reverse',open:'open circuit',short:ar?'بيعدّي بس':'carries, 0 W'};
-  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="font-family:'IBM Plex Mono',monospace;direction:ltr">`; const yl=T.Np===2?[50,100]:[75], yd=T.Np===2?148:122, items=[];
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="font-family:'IBM Plex Mono',monospace;direction:ltr">`; const yl=T.Np===1?[75]:T.Np===2?[50,100]:[42,82,122,162], yd=T.Np===1?122:T.Np===2?148:208, items=[];
   s+=`<circle cx="22" cy="${yl[0]}" r="5" fill="${CC.txt}"/>`+svgT(22,yl[0]-12,'−',{fs:14,w:1})+`<circle cx="${W-22}" cy="${yl[0]}" r="5" fill="${CC.txt}"/>`+svgT(W-22,yl[0]-12,'+',{fs:14,w:1});
-  mr.subs.forEach((sb,k)=>{ const ts=tr.subs[k], x0=40+k*BW, x1=x0+BW-20, Ih=sb.halves.map(h=>T.Np===2?invDec(Cg,h.V,ts.V):I-(ts.bypass?ts.Id:0));
+  mr.subs.forEach((sb,k)=>{ const ts=tr.subs[k], x0=40+k*BW, x1=x0+BW-20, Ih=sb.halves.map(h=>T.Np>1?invDec(Cg,h.V,ts.V):I-(ts.bypass?ts.Id:0));
     s+=`<line x1="${x0}" y1="${yl[0]-12}" x2="${x0}" y2="${yd}" stroke="${CC.wire}" stroke-width="2"/><line x1="${x1}" y1="${yl[0]-12}" x2="${x1}" y2="${yd}" stroke="${CC.wire}" stroke-width="2"/>`;
     if(k===0) s+=`<line x1="22" y1="${yl[0]}" x2="${x0}" y2="${yl[0]}" stroke="${CC.wire}" stroke-width="${lw(I,Imax)}"/>`;
     s+=`<line x1="${x1}" y1="${yl[0]}" x2="${k===nS-1?W-22:x1+20}" y2="${yl[0]}" stroke="${CC.wire}" stroke-width="${lw(I,Imax)}"/>`;
     sb.halves.forEach((h,hi)=>{ const hs=halfState(T,h.ids,Ih[hi],ts.V), c=CC[hs.st==='gen'?'gen':hs.st], y=yl[hi];
       s+=`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="${c}" stroke-width="${lw(Ih[hi],Imax)}" opacity="${hs.st==='open'?0.45:1}"/>
         <g data-cell="${hs.w}" style="cursor:pointer"><rect x="${x0+28}" y="${y-15}" width="${BW-76}" height="30" rx="6" fill="#0B1716" stroke="${c}" stroke-width="1.6"/>
-        ${svgT(x0+28+(BW-76)/2,y-2,T.Np===2?(hi?(ar?'تحت':'bottom'):(ar?'فوق':'top'))+' · '+lab[hs.st]:lab[hs.st],{fs:10.5,rtl:ar,c})}
+        ${svgT(x0+28+(BW-76)/2,y-2,T.Np>1?grpShort(T,hi,ar)+' · '+lab[hs.st]:lab[hs.st],{fs:10.5,rtl:ar,c})}
         ${svgT(x0+28+(BW-76)/2,y+11,fmt(Ih[hi],2)+' A · '+(Math.abs(Ih[hi]*ts.V)<0.5?'0':fmt(Ih[hi]*ts.V,0))+' W',{fs:10,c:CC.mut})}</g>`;
       items.push({k,hi,...hs,I:Ih[hi]}); });
     const dc=ts.bypass?CC.diode:'#2E4340', xm=(x0+x1)/2;
@@ -1152,12 +1224,12 @@ function moduleCircuit(T){ const ar=S.lang==='ar', tr=R.mtr, mr=R.mr, I=R.Icur, 
     s+=svgT(xm,14,'SS'+(k+1)+' '+fmt(ts.V,2)+' V',{c:ts.V<0?CC.rev:'#5EA8FF',w:1}); });
   s+='</svg>';
   const L=[], n=x=>`<b>${x}</b>`;
-  L.push(ar?`اللوح ${nS} أقسام توالي${T.Np===2?'، وكل قسم نصين توازي (half-cut)':''}، وعلى كل قسم bypass diode. تيار اللوح ${n(fmt(I,2)+' A')} لازم يعدّي في كل قسم، وفولت اللوح = مجموع فولتات الأقسام = ${n(fmt(R.Vcur,2)+' V')}، يعني ${n(fmt(R.Vcur*I,0)+' W')}. ${S.ctx==='iso'?'التيار ده اختاره الـ MPPT بتاع اللوح لوحده.':'التيار ده بيفرضه الاسترينج.'}`
-    :`The module is ${nS} substrings in series${T.Np===2?', each made of two halves in parallel (half-cut)':''}, each with a bypass diode. The module current ${n(fmt(I,2)+' A')} has to pass through every substring, and the module voltage is the sum of the substring voltages = ${n(fmt(R.Vcur,2)+' V')}, i.e. ${n(fmt(R.Vcur*I,0)+' W')}. ${S.ctx==='iso'?"This current was chosen by the module's own MPPT.":'This current is imposed by the string.'}`);
-  tr.subs.forEach((ts,k)=>{ const its=items.filter(x=>x.k===k); if(ts.bypass) L.push(ar?`${n('القسم '+(k+1)+':')} مش قادر يعدّي ${fmt(I,2)} A بفولت موجب، ففولته وقع لـ ${fmt(ts.V,2)} V والدايود فتح وبيشيل ${n(fmt(ts.Id,2)+' A')}. ${its.map(x=>`${T.Np===2?(x.hi?'النص اللي تحت':'النص اللي فوق'):'السلسلة'}: ${lab[x.st]} (${fmt(x.I,2)} A)`).join('، ')}.`
-      :`${n('Substring '+(k+1)+':')} it cannot pass ${fmt(I,2)} A at a positive voltage, so its voltage fell to ${fmt(ts.V,2)} V and the diode opened, carrying ${n(fmt(ts.Id,2)+' A')}. ${its.map(x=>`${T.Np===2?(x.hi?'bottom half':'top half'):'chain'}: ${lab[x.st]} (${fmt(x.I,2)} A)`).join(', ')}.`);
-    else if(its.some(x=>x.st!=='gen')) L.push(ar?`${n('القسم '+(k+1)+':')} الدايود مطفي لأن القسم لسه بيعدّي التيار بفولت موجب (${fmt(ts.V,2)} V). ${its.map(x=>`${T.Np===2?(x.hi?'النص اللي تحت':'النص اللي فوق'):'السلسلة'}: ${lab[x.st]} (${fmt(x.I,2)} A)`).join('، ')}.`
-      :`${n('Substring '+(k+1)+':')} the diode is off because the substring still carries the current at a positive voltage (${fmt(ts.V,2)} V). ${its.map(x=>`${T.Np===2?(x.hi?'bottom half':'top half'):'chain'}: ${lab[x.st]} (${fmt(x.I,2)} A)`).join(', ')}.`); });
+  L.push(ar?`اللوح ${nS} أقسام توالي${T.Np===2?'، وكل قسم نصين توازي (half-cut)':T.Np===4?'، وكل قسم 4 أرباع توازي (quarter-cut)':''}، وعلى كل قسم bypass diode. تيار اللوح ${n(fmt(I,2)+' A')} لازم يعدّي في كل قسم، وفولت اللوح = مجموع فولتات الأقسام = ${n(fmt(R.Vcur,2)+' V')}، يعني ${n(fmt(R.Vcur*I,0)+' W')}. ${S.ctx==='iso'?'التيار ده اختاره الـ MPPT بتاع اللوح لوحده.':'التيار ده بيفرضه الاسترينج.'}`
+    :`The module is ${nS} substrings in series${T.Np===2?', each made of two halves in parallel (half-cut)':T.Np===4?', each made of four quarters in parallel (quarter-cut)':''}, each with a bypass diode. The module current ${n(fmt(I,2)+' A')} has to pass through every substring, and the module voltage is the sum of the substring voltages = ${n(fmt(R.Vcur,2)+' V')}, i.e. ${n(fmt(R.Vcur*I,0)+' W')}. ${S.ctx==='iso'?"This current was chosen by the module's own MPPT.":'This current is imposed by the string.'}`);
+  tr.subs.forEach((ts,k)=>{ const its=items.filter(x=>x.k===k); if(ts.bypass) L.push(ar?`${n('القسم '+(k+1)+':')} مش قادر يعدّي ${fmt(I,2)} A بفولت موجب، ففولته وقع لـ ${fmt(ts.V,2)} V والدايود فتح وبيشيل ${n(fmt(ts.Id,2)+' A')}. ${its.map(x=>`${grpLab(T,x.hi,true)}: ${lab[x.st]} (${fmt(x.I,2)} A)`).join('، ')}.`
+      :`${n('Substring '+(k+1)+':')} it cannot pass ${fmt(I,2)} A at a positive voltage, so its voltage fell to ${fmt(ts.V,2)} V and the diode opened, carrying ${n(fmt(ts.Id,2)+' A')}. ${its.map(x=>`${grpLab(T,x.hi,false)}: ${lab[x.st]} (${fmt(x.I,2)} A)`).join(', ')}.`);
+    else if(its.some(x=>x.st!=='gen')) L.push(ar?`${n('القسم '+(k+1)+':')} الدايود مطفي لأن القسم لسه بيعدّي التيار بفولت موجب (${fmt(ts.V,2)} V). ${its.map(x=>`${grpLab(T,x.hi,true)}: ${lab[x.st]} (${fmt(x.I,2)} A)`).join('، ')}.`
+      :`${n('Substring '+(k+1)+':')} the diode is off because the substring still carries the current at a positive voltage (${fmt(ts.V,2)} V). ${its.map(x=>`${grpLab(T,x.hi,false)}: ${lab[x.st]} (${fmt(x.I,2)} A)`).join(', ')}.`); });
   L.push(ar?'اضغط على أي نص في الرسمة عشان تشوف دايرة أضعف خلية فيه.':'Click any half in the drawing to see the circuit of its weakest cell.');
   const nOn=tr.subs.filter(x=>x.bypass).length, hasRev=items.some(x=>x.st==='rev'), odd=items.some(x=>x.st!=='gen');
   const tag=nOn?[hasRev?'bad':'warn',(ar?`${nOn} دايود شغال`:`${nOn} diode${nOn>1?'s':''} on`)+(hasRev?(ar?' · خلية بالعكس':' · cell in reverse'):'')]:odd?['info',ar?'الدايودات مطفية · التيار اتحدد بالظل':'Diodes off · current limited by shade']:['good',ar?'كل الأقسام بتنتج':'All substrings producing'];
@@ -1207,6 +1279,8 @@ function openCircuit(lvl){ if(lvl) CIR.lvl=lvl; const T=CT(), ar=S.lang==='ar';
   $('cModal').hidden=false; }
 
 // ================= why is the diode on/off (electrical walk-through) =================
+function grpLab(T,hi,ar){ if(T.Np===2) return hi?(ar?'النص اللي تحت':'bottom half'):(ar?'النص اللي فوق':'top half'); if(T.Np===4) return (ar?'الربع ':'quarter ')+(hi+1); return ar?'السلسلة':'chain'; }
+function grpShort(T,hi,ar){ if(T.Np===2) return hi?(ar?'تحت':'bottom'):(ar?'فوق':'top'); return 'Q'+(hi+1); }
 function subSvg(T,k,I,Ih,Id,on,Vs,col){
   const ar=S.lang==='ar', W=230,H=150, y=[32,72], yd=118, L=18, Rr=212;
   const th=v=>Math.max(1.2,Math.min(6,1.2+Math.abs(v)/I*4.8||1.2));
@@ -1219,6 +1293,7 @@ function subSvg(T,k,I,Ih,Id,on,Vs,col){
     <text x="${L}" y="12" fill="#8AA39E" font-size="10" text-anchor="middle">−</text><text x="${Rr}" y="12" fill="#8AA39E" font-size="10" text-anchor="middle">+</text>
     <text x="115" y="12" fill="${Vs<0?'#ff6a5a':'#5EA8FF'}" font-size="11" text-anchor="middle" font-weight="600">SS${k+1} = ${fmt(Vs,2)} V</text>`;
   if(T.Np===2){ s+=br(y[0],ar?'النص اللي فوق':'top half',Ih[0],col[0])+br(y[1],ar?'النص اللي تحت':'bottom half',Ih[1],col[1]); }
+  else if(T.Np>2){ for(let q=0;q<T.Np;q++){ const yy=24+q*(84/(T.Np-1)); s+=br(yy,grpLab(T,q,ar),Ih[q],col[q]); } }
   else s+=br((y[0]+y[1])/2,ar?`${T.Ns/T.nSub} خلية توالي`:`${T.Ns/T.nSub} cells in series`,Ih[0],col[0]);
   const dc=on?'#FF8A3D':'#2E4340';
   s+=`<line x1="${L}" y1="${yd}" x2="${Rr}" y2="${yd}" stroke="${dc}" stroke-width="${on?th(Id):1.2}" opacity="${on?1:0.5}"/>
@@ -1246,7 +1321,7 @@ function openDiodeInfo(){
     :'The diode is passive; nothing switches it. It only depends on one thing: can the substring pass the required current at a positive voltage? If yes, it stays off. If not, the weak cells are driven into reverse until the substring reaches about −0.4 V, and the diode opens and carries the difference.'}</span></li>`;
   html+='</ol><div class="dgrid">';
   // 3. per substring
-  mr.subs.forEach((s,k)=>{ const ts=tr.subs[k], Ih=s.halves.map(h=>T.Np===2?invDec(Cg,h.V,ts.V):I-(ts.bypass?ts.Id:0)), Ilim=Math.max(0,invDec(eng.Ig,s.raw,0));
+  mr.subs.forEach((s,k)=>{ const ts=tr.subs[k], Ih=s.halves.map(h=>T.Np>1?invDec(Cg,h.V,ts.V):I-(ts.bypass?ts.Id:0)), Ilim=Math.max(0,invDec(eng.Ig,s.raw,0));
     const col=Ih.map(v=>v<I/T.Np*0.6?'#ff6a5a':'#3DDC97');
     const ids=s.halves.flatMap(h=>h.ids); const shaded=ids.some(id=>R.mtr.cells[id].V<0);
     const why=ts.bypass?(ar?`الـ substring ده أقصى تيار يعدّيه وفولته موجب ${n(A(Ilim))}، والمطلوب ${n(A(I))}، فالدايود بيشيل الفرق ${n(A(ts.Id))}.`:`This substring can pass at most ${n(A(Ilim))} at a positive voltage, but ${n(A(I))} is needed, so the diode carries the difference, ${n(A(ts.Id))}.`)
@@ -1256,11 +1331,11 @@ function openDiodeInfo(){
     s.halves.forEach((h,hi)=>{ let w=h.ids[0]; h.ids.forEach(id=>{ if(R.mtr.cells[id].V<R.mtr.cells[w].V) w=id; }); const c=R.mtr.cells[w]; if(c.V>-0.2) return;
       const others=h.ids.filter(id=>id!==w), sumO=others.reduce((a,id)=>a+R.mtr.cells[id].V,0), nOth=others.length, nRev=h.ids.filter(id=>R.mtr.cells[id].V<-0.2).length;
       kvl+=`<p class="note" style="color:#c3cfdb;font-size:12.5px;margin:6px 0 0">${ar
-        ?`<b>ليه الخلية (${cellName(T,w)}) عليها جهد سالب؟</b> الخلايا اللي في ${T.Np===2?(hi?'النص اللي تحت':'النص اللي فوق'):'القسم'} متوصلة توالي، ومجموع فولتاتهم لازم يساوي فولت الـ substring (${Vv(ts.V)})، لأنه متوصل بين نفس النقطتين مع ${T.Np===2?'النص التاني و':''}الدايود. باقي الخلايا (${nOth}) مجموعهم ${Vv(sumO)}، فالخلية دي لازم تبقى ${Vv(ts.V)} − ${Vv(sumO)} = ${n(Vv(c.V))}${nRev>1?`، والجهد العكسي متقسم على ${nRev} خلايا متظللة`:''}. التيار اللي ماشي فيها ${n(A(c.I))}، فبتبدد |V| × I = ${n(fmt(c.Pd,1)+' W')} حرارة (${fmt(c.Th,0)}°C).`
-        :`<b>Why is cell (${cellName(T,w)}) negative?</b> The cells in ${T.Np===2?(hi?'the bottom half':'the top half'):'this substring'} are in series, and their voltages must add up to the substring voltage (${Vv(ts.V)}), because it sits between the same two nodes as ${T.Np===2?'the other half and ':''}the diode. The other ${nOth} cells add up to ${Vv(sumO)}, so this cell has to be ${Vv(ts.V)} − ${Vv(sumO)} = ${n(Vv(c.V))}${nRev>1?`, with the reverse voltage shared by ${nRev} shaded cells`:''}. ${n(A(c.I))} flows through it, so it dissipates |V| × I = ${n(fmt(c.Pd,1)+' W')} as heat (${fmt(c.Th,0)}°C).`}</p>`; });
+        ?`<b>ليه الخلية (${cellName(T,w)}) عليها جهد سالب؟</b> الخلايا اللي في ${T.Np>1?grpLab(T,hi,true):'القسم'} متوصلة توالي، ومجموع فولتاتهم لازم يساوي فولت الـ substring (${Vv(ts.V)})، لأنه متوصل بين نفس النقطتين مع ${T.Np>1?'باقي المجموعات و':''}الدايود. باقي الخلايا (${nOth}) مجموعهم ${Vv(sumO)}، فالخلية دي لازم تبقى ${Vv(ts.V)} − ${Vv(sumO)} = ${n(Vv(c.V))}${nRev>1?`، والجهد العكسي متقسم على ${nRev} خلايا متظللة`:''}. التيار اللي ماشي فيها ${n(A(c.I))}، فبتبدد |V| × I = ${n(fmt(c.Pd,1)+' W')} حرارة (${fmt(c.Th,0)}°C).`
+        :`<b>Why is cell (${cellName(T,w)}) negative?</b> The cells in ${T.Np>1?'the '+grpLab(T,hi,false):'this substring'} are in series, and their voltages must add up to the substring voltage (${Vv(ts.V)}), because it sits between the same two nodes as ${T.Np>1?'the other group'+(T.Np>2?'s':'')+' and ':''}the diode. The other ${nOth} cells add up to ${Vv(sumO)}, so this cell has to be ${Vv(ts.V)} − ${Vv(sumO)} = ${n(Vv(c.V))}${nRev>1?`, with the reverse voltage shared by ${nRev} shaded cells`:''}. ${n(A(c.I))} flows through it, so it dissipates |V| × I = ${n(fmt(c.Pd,1)+' W')} as heat (${fmt(c.Th,0)}°C).`}</p>`; });
     html+=`<div class="dcard ${ts.bypass?'on':''}">${subSvg(T,k,I,Ih,ts.Id,ts.bypass,ts.V,col)}<p class="note" style="color:#c3cfdb;font-size:12.5px;margin:4px 0 0">${why}</p>${kvl}</div>`; });
   html+='</div><ol class="hs" start="3">';
-  if(T.Np===2) html+=`<li><b>${ar?'ليه النص السليم بيعدّي تيار ومش بينتج؟':'Why does the healthy half carry current but produce nothing?'}</b><span>${ar
+  if(T.Np>1) html+=`<li><b>${ar?'ليه النص السليم بيعدّي تيار ومش بينتج؟':'Why does the healthy half carry current but produce nothing?'}</b><span>${ar
     ?'النصين والدايود متوصلين بين نفس النقطتين، فكلهم على نفس الفولت. لما الدايود يشتغل الفولت ده بيبقى حوالي −0.4 V، فخلايا النص السليم بتشتغل قريب من الـ short circuit: تيار عالي (قرب الـ Isc بتاعه) بس فولت تقريباً صفر، يعني قدرة صفر. الفايدة الوحيدة إنه بيخفف الحمل على الدايود.'
     :'Both halves and the diode sit between the same two nodes, so they share one voltage. When the diode conducts that voltage is about −0.4 V, so the healthy half runs near short circuit: high current (close to its Isc) but almost zero voltage, so zero power. Its only benefit is taking load off the diode.'}</span></li>`;
   html+=`<li><b>${ar?'Global MPPT scan (المسح الكامل)':'Global MPPT scan'}</b><span>${ar
@@ -1380,7 +1455,7 @@ function renderCompareA(cur){
 
 const PRESETS={pBottom:[[0,0.93,1,1,1]],pHalf:[[0,0.5,1,1,0.8]],pBird:[[0.42,0.27,0.58,0.32,0.9]],pPole:[[0.47,0,0.55,1,0.75]],pSide:[[0,0,0.17,1,1]],pCorner:[[0.66,0.76,1,1,1]]};
 function presetShade(T,name){ if(name==='pBird'){ const sh=new Float32Array(T.cols*T.rows); sh[hotCellIndex(T)]=0.7; return sh; }
- const sh=new Float32Array(T.cols*T.rows), mid=(T.kind==='csi'&&T.Np===2)?0.022:0, ch=(1-mid)/T.rows;
+ const sh=new Float32Array(T.cols*T.rows), mid=(T.kind==='csi'&&T.Np>=2)?0.022:0, ch=(1-mid)/T.rows;
   for(let r=0;r<T.rows;r++) for(let c=0;c<T.cols;c++){ const x0=c/T.cols,x1=(c+1)/T.cols, y0=r*ch+(mid&&r>=T.rows/2?mid:0), y1=y0+ch; let s=0;
     PRESETS[name].forEach(([a,b,cc,d,o])=>{ const ox=Math.max(0,Math.min(x1,cc)-Math.max(x0,a)), oy=Math.max(0,Math.min(y1,d)-Math.max(y0,b)); s=Math.max(s,o*ox*oy/((x1-x0)*(y1-y0))); });
     sh[r*T.cols+c]=Math.round(Math.min(1,s)*20)/20; }
@@ -1564,7 +1639,8 @@ function moduleInsights(T,mr,ref,hotT,pd,loss,tL){
   if(m.defect.includes(3)) out.push(ar?'Rs عالي: الـ FF بيقل والخلية بتسخن بـ I²R.':'High Rs lowers FF and heats the cell by I²R.');
   if(tL>2) out.push(ar?`الحرارة لوحدها شايلة ${fmt(tL,1)}% من القدرة (γ = ${T.gP}%/°C). ارفع حرارة الجو وشوف الإطار بيحمر والفولت بيقل.`:`Temperature alone costs ${fmt(tL,1)}% (γ = ${T.gP}%/°C). Raise the ambient and watch the frame turn red and the voltage drop.`);
   if(T.kind==='csi'&&anyShade){ const bottom=[...m.shade.slice((T.rows-1)*T.cols)].every(x=>x>0.5);
-    if(T.Np===2) out.push(ar?`Half-cut: النص العلوي والسفلي على التوازي جوه كل substring، فظل الصف السفلي بيأثر على النص السفلي بس${bottom?' — جرّب "Full cell" بنفس الظل وقارن.':'.'}`:`Half-cut: top and bottom halves are in parallel inside each substring, so a bottom-row shadow only hits the bottom half${bottom?' — switch to "Full cell" with the same shadow and compare.':'.'}`);
+    if(T.Np===4) out.push(ar?`Quarter-cut: كل substring فيه 4 مجموعات متوازية (كل واحدة ربع الطول)، فالظل على صف بيأثر على ربع الـ substring بس، والتلات أرباع التانيين بيشيلوا التيار. التيار في كل ربع خلية ربع تيار الخلية الكاملة، فالـ I²R والحرارة في الخلية المظللة أقل.`:`Quarter-cut: each substring has 4 parallel groups (each a quarter of the length), so a shadow on one row hits only a quarter of the substring and the other three carry the current. Each quarter cell carries a quarter of the full-cell current, so I²R and the heat in a shaded cell are lower.`);
+    else if(T.Np===2) out.push(ar?`Half-cut: النص العلوي والسفلي على التوازي جوه كل substring، فظل الصف السفلي بيأثر على النص السفلي بس${bottom?' — جرّب "Full cell" بنفس الظل وقارن.':'.'}`:`Half-cut: top and bottom halves are in parallel inside each substring, so a bottom-row shadow only hits the bottom half${bottom?' — switch to "Full cell" with the same shadow and compare.':'.'}`);
     else out.push(ar?'Full cell: كل الخلايا في الـ substring على التوالي، فخلية واحدة مظللة بتحدد تيار الـ substring كله. ظل صف سفلي بيقفل التلات substrings مرة واحدة.':'Full cell: every cell in a substring is in series, so one shaded cell limits the whole substring. A bottom-row shadow takes out all three substrings at once.'); }
   if(S.src==='loc'){ const sw=tiltSweep(T), ia=sw.ann.reduce((b,v,i)=>v>sw.ann[b]?i:b,0), cur=yearEnergy(T,S.loc.lat,S.loc.tilt,S.loc.az,S.env.Tamb)/(T.Pmax/1000), pc=cur/sw.ann[ia]*100;
     out.push(ar?`عند ميل ${S.loc.tilt}° واتجاه ${S.loc.az}° اللوح بيدي ${fmt(pc,1)}% من أفضل إنتاج سنوي. أفضل ميل هنا حوالي ${sw.tilts[ia]}° (قريب من خط العرض ${fmt(S.loc.lat,1)}°).`:`At ${S.loc.tilt}° tilt and ${S.loc.az}° azimuth the module gives ${fmt(pc,1)}% of the best annual yield. The best tilt here is about ${sw.tilts[ia]}° (close to the ${fmt(S.loc.lat,1)}° latitude).`); }
@@ -1578,13 +1654,15 @@ function renderArray(){
   const box=$('strings'); box.innerHTML=''; box.classList.toggle('many',S.strings.length>8); $('nStr').value=S.strings.length;
   S.strings.forEach((s,si)=>{
     const d=document.createElement('div'); d.className='str';
-    d.innerHTML=`<div class="row between"><b class="mono">${t('str')} ${si+1}</b><div class="row"><span class="step"><button data-a="dec" aria-label="−">−</button><span>${s.length}</span><button data-a="inc" aria-label="+">+</button></span>${S.strings.length>1?`<button class="btn" data-a="del" aria-label="remove">✕</button>`:''}</div></div><div class="tiles"></div>`;
+    d.innerHTML=`<div class="row between"><b class="mono">${t('str')} ${si+1}</b><div class="row"><span class="step"><button data-a="dec" aria-label="−">−</button><input class="lenIn" data-a="len" type="number" min="1" max="60" step="1" value="${s.length}" aria-label="${t('nMods')}"><button data-a="inc" aria-label="+">+</button></span>${S.strings.length>1?`<button class="btn" data-a="del" aria-label="remove">✕</button>`:''}</div></div><div class="tiles"></div>`;
     const tl=d.querySelector('.tiles');
     s.forEach((m,mi)=>{ const b=document.createElement('button'), o=OPS[si][mi];
       b.className='tile'+(m.shade.some(x=>x>0)||m.soil>0||m.gf<1?' sh':'')+(o.hot>85?' hot':o.byp?' byp':'')+(o.rev?' rev':'')+(S.sel.s===si&&S.sel.m===mi?' sel':'');
       b.style.setProperty('--tc',BASE[S.tech]); b.title=`${t('str')} ${si+1} · ${t('mod')} ${mi+1}`; b.onclick=()=>{ S.sel={s:si,m:mi}; schedule(); }; tl.appendChild(b); });
     d.querySelector('[data-a=dec]').onclick=()=>{ if(s.length>1){ s.pop(); if(S.sel.s===si&&S.sel.m>=s.length) S.sel.m=s.length-1; schedule(); } };
-    d.querySelector('[data-a=inc]').onclick=()=>{ if(s.length<40){ s.push(eng.newModule()); schedule(); } };
+    d.querySelector('[data-a=inc]').onclick=()=>{ if(s.length<60){ s.push(eng.newModule()); schedule(); } };
+    d.querySelector('[data-a=len]').addEventListener('change',e=>{ const n=Math.max(1,Math.min(60,Math.round(+e.target.value||1))); while(s.length<n) s.push(eng.newModule()); while(s.length>n) s.pop(); if(S.sel.s===si&&S.sel.m>=s.length) S.sel.m=s.length-1; schedule(); });
+    d.querySelector('[data-a=len]').addEventListener('keydown',e=>{ if(e.key==='Enter') e.target.blur(); });
     const del=d.querySelector('[data-a=del]'); if(del) del.onclick=()=>{ S.strings.splice(si,1); S.sel={s:0,m:0}; schedule(); };
     box.appendChild(d); });
   const ca=cssv('--amp'), cp=cssv('--pwr');
@@ -1823,7 +1901,7 @@ function renderStatic(){
   seg('opSeg',[[0.25,'25%'],[0.5,'50%'],[0.75,'75%'],[1,'100%']],()=>S.toolVal,v=>S.toolVal=v); $('opRow').hidden=S.tool!=='shade';
   seg('srcSeg',[['manual','srcMan'],['loc','srcLoc']],()=>S.src,v=>{ S.src=v; if(v!=='loc') stopPlay(); envUpd(); });
   $('manualBox').hidden=S.src!=='manual'; $('locBox').hidden=S.src!=='loc';
-  const CTt=CT(); seg('laySeg',[['half','layHalf'],['full','layFull']],()=>CTt.Np===2?'half':'full',v=>{ S.layout=v; setTech(S.tech); }); $('laySeg').hidden=CTt.kind!=='csi';
+  const CTt=CT(); seg('laySeg',[['full','layFull'],['half','layHalf'],['quarter','layQuarter']],()=>CTt.Np===4?'quarter':CTt.Np===2?'half':'full',v=>{ S.layout=v; setTech(S.tech); }); $('laySeg').hidden=CTt.kind!=='csi';
   $('lMonth').innerHTML=t('months').map((m,i)=>`<option value="${i}" ${i===S.loc.month?'selected':''}>${m}</option>`).join('');
   $('lCity').innerHTML=CITIES.map((c,i)=>`<option value="${i}">${c[0]==='Custom'?t('custom'):c[0]}</option>`).join('');
   { const i=CITIES.findIndex(c=>c[1]===S.loc.lat&&c[2]===S.loc.lon); $('lCity').value=i>=0?i:CITIES.length-1; }
@@ -1843,10 +1921,12 @@ function renderStatic(){
   renderTechs(); if(!$('dsModal').hidden) renderDsForm();
   $('flowBtn').setAttribute('aria-pressed',!!S.flow); if(S.tab!=='module') $('inspCard').hidden=true; else $('inspCard').hidden=S.insp==null;
 }
-function render(){ if(S.tab==='module') renderModule(); else if(S.tab==='array') renderArray(); else if(S.tab==='compare') renderCompare(); else renderModel(); }
+function render(){ if(S.tab==='module') renderModule(); else if(S.tab==='array') renderArray(); else if(S.tab==='compare') cmpInit(); else { renderModel(); renderCompare(); } }
 function bind(){
-  $('themeBtn').onclick=()=>{ THEME=THEME==='dark'?'light':'dark'; try{ localStorage.setItem('pvlab-theme',THEME); }catch(e){} applyTheme(); renderStatic(); schedule(); };
-  $('lgAr').onclick=()=>{ S.lang='ar'; renderStatic(); schedule(); }; $('lgEn').onclick=()=>{ S.lang='en'; renderStatic(); schedule(); };
+  $('themeBtn').onclick=()=>{ THEME=THEME==='dark'?'light':'dark'; try{ localStorage.setItem('pvlab-theme',THEME); }catch(e){} applyTheme(); renderStatic(); schedule(); cmpBroadcast({type:'pvlab:theme',theme:THEME}); };
+  $('lgAr').onclick=()=>{ S.lang='ar'; renderStatic(); schedule(); cmpBroadcast({type:'pvlab:lang',lang:'ar'}); }; $('lgEn').onclick=()=>{ S.lang='en'; renderStatic(); schedule(); cmpBroadcast({type:'pvlab:lang',lang:'en'}); };
+  $('cpAB').onclick=()=>cmpCopy('A','B'); $('cpBA').onclick=()=>cmpCopy('B','A'); $('cmpReset').onclick=()=>{ const st=getState(); cmpPost('A',{type:'pvlab:set',state:st}); cmpPost('B',{type:'pvlab:set',state:st}); };
+  $('nStr').addEventListener('keydown',e=>{ if(e.key==='Enter') e.target.blur(); });
   document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ S.tab=b.dataset.tab; renderStatic(); requestAnimationFrame(()=>{ if(S.tab==='module') layoutModule(); schedule(); }); });
   $('zoomBtn').onclick=()=>{ S.zoom=!S.zoom; layoutModule(); schedule(); if(S.zoom){ const p=$('plate'); requestAnimationFrame(()=>{ const hc=GEO&&R.mtr?R.mtr.cells.reduce((b,c,i,a)=>c.Th>a[b].Th?i:b,0):0, r=GEO.rects[hc]; if(r){ p.scrollTop=Math.max(0,r.y-p.clientHeight/2); p.scrollLeft=Math.max(0,r.x-p.clientWidth/2); } }); } };
   $('undoBtn').onclick=undo;
